@@ -6,10 +6,22 @@ TODO
 
 ## Installation
 
+### Clone
+
+```
+git clone https://github.com/delmalih/one-shot-classification
+cd one-shot-classification
+```
+
 ### Pyenv
 
-TODO
+```
+pyenv virtualenv 3.6.12 one-shot-classification
+pyenv local one-shot-classification
+```
 
 ### Requirements
 
-TODO
+```
+pip install -r requirements.txt
+```
