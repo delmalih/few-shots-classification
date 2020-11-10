@@ -1,0 +1,5 @@
+*.pyc
+files/
+tmp.*
+.vscode
+.python-version
