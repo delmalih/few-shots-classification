@@ -1,6 +1,6 @@
-###########
-# Imports #
-###########
+##########################
+# Imports
+##########################
 
 
 # Global imports
@@ -13,9 +13,9 @@ import utils
 import constants
 
 
-##############
-# Classifier #
-##############
+##########################
+# Classifier
+##########################
 
 
 class BaselineClassifier(object):
