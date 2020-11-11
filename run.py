@@ -59,11 +59,11 @@ def get_classifier(args):
     if args.classifier == "Baseline":
         return BaselineClassifier(args.catalog_folder)
     elif args.classifier == "Custom":
-        return CustomClassifier(args.catalog_images_paths)
+        return CustomClassifier(args.catalog_folder)
     # elif args.classifier == "BOW":
-    #     return BOWClassifier(args.catalog_images_paths)
+    #     return BOWClassifier(args.catalog_folder)
     else:
-        return CustomClassifier(args.catalog_images_paths)
+        return CustomClassifier(args.catalog_folder)
 
 
 ##########################
@@ -106,6 +106,6 @@ if __name__ == "__main__":
 
         # Print
         print(f"Metrics: \
-                Top1 = {top1 * 100:.3f} | \
-                Top3 = {top3 * 100:.3f} | \
-                Top5 = {top5 * 100:.3f}")
+                Top1 = {top1 * 100:.3f}% | \
+                Top3 = {top3 * 100:.3f}% | \
+                Top5 = {top5 * 100:.3f}%")
