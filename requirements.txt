@@ -1,4 +1,5 @@
 tqdm
+click
 nmslib
 imutils
 easydict
