@@ -1,5 +1,5 @@
 tqdm
-click
+pylint
 nmslib
 imutils
 easydict
