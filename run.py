@@ -96,9 +96,9 @@ if __name__ == "__main__":
         # Print
         print("Top 5 labels :")
         for k, label in enumerate(top5labels):
-            print(f"{k + 1}. \
-                  Label = {label}, \
-                  Score = {scores[label]}")
+            print(f"{k + 1}. " +
+                  f"Label = {label}, " +
+                  f"Score = {scores[label]}")
 
     # Case multiple images
     if args.query_folder:
