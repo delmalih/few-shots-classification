@@ -121,16 +121,31 @@ class CustomClassifier(BaselineClassifier):
         trainIdx = np.array([m[0] for m in matches])
         distances = np.array([m[1] for m in matches])
 
-        # Compute scores
+        # Init. scores variables
         scores = {}
         N_desc = query_descriptors.shape[0]
         scores_matrix = np.exp(-((distances / self.score_sigma) ** 2))
+
+        # Loop over matches
         for ind, nn_trainIdx in enumerate(trainIdx):
+
+            # Loop over neareast neighbors
             for k, idx in enumerate(nn_trainIdx):
+
+                # Get catalog path
                 catalog_path = self.catalog_images_paths[idx // N_desc]
+
+                # Get label
                 catalog_label = catalog_path.split("/")[-2]
+
+                # Compute score
                 scores[catalog_label] = scores.get(catalog_label, 0) + \
                     scores_matrix[ind, k]
+
+        # Softmax
+        softmax_denom = np.exp(list(scores.values())).sum()
+        scores = {key: np.exp(
+            scores[key]) / softmax_denom for key in scores}
 
         return scores
 
