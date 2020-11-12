@@ -114,10 +114,10 @@ if __name__ == "__main__":
             top3label = top3[label]
             top5label = top5[label]
             print(f"{label}: " +
-                  "Top1 = {top1label * 100:.3f}% | " +
-                  "Top3 = {top3label * 100:.3f}% | " +
-                  "Top5 = {top5label * 100:.3f}%")
+                  f"Top1 = {top1label * 100:.3f}% | " +
+                  f"Top3 = {top3label * 100:.3f}% | " +
+                  f"Top5 = {top5label * 100:.3f}%")
         print(f"Means: " +
-              "Top1 = {top1global * 100:.3f}% | " +
-              "Top3 = {top3global * 100:.3f}% | " +
-              "Top5 = {top5global * 100:.3f}%")
+              f"Top1 = {top1global * 100:.3f}% | " +
+              f"Top3 = {top3global * 100:.3f}% | " +
+              f"Top5 = {top5global * 100:.3f}%")
