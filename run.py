@@ -6,6 +6,7 @@
 # Global imports
 import os
 import argparse
+import numpy as np
 from glob import glob
 
 # Local imports
@@ -103,9 +104,20 @@ if __name__ == "__main__":
     if args.query_folder:
         # Compute metrics
         top1, top3, top5 = classifier.compute_metrics(args.query_folder)
+        top1global = np.mean(list(top1.values()))
+        top3global = np.mean(list(top3.values()))
+        top5global = np.mean(list(top5.values()))
 
         # Print
-        print(f"Metrics: \
-                Top1 = {top1 * 100:.3f}% | \
-                Top3 = {top3 * 100:.3f}% | \
-                Top5 = {top5 * 100:.3f}%")
+        for label in top1.keys():
+            top1label = top1[label]
+            top3label = top3[label]
+            top5label = top5[label]
+            print(f"{label}: " +
+                  "Top1 = {top1label * 100:.3f}% | " +
+                  "Top3 = {top3label * 100:.3f}% | " +
+                  "Top5 = {top5label * 100:.3f}%")
+        print(f"Means: " +
+              "Top1 = {top1global * 100:.3f}% | " +
+              "Top3 = {top3global * 100:.3f}% | " +
+              "Top5 = {top5global * 100:.3f}%")
