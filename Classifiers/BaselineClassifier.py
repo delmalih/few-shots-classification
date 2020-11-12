@@ -103,22 +103,31 @@ class BaselineClassifier(object):
 
     def compute_top_k_accuracy(self, predictions, k):
         # Init. counters
-        nb_correct = counter = 0
+        correct_counter = {}
+        total_counter = {}
+        accuracy = {}
 
         # Loop
         for img_id in predictions.keys():
+            # Get ground truth label
             gt_label = img_id.split("/")[0]
+
+            # Get predicted labels
             pred_labels = sorted(predictions[img_id].keys(),
                                  key=lambda x: predictions[img_id][x],
                                  reverse=True)[:k]
+
+            # Update counters
             if gt_label in pred_labels:
-                nb_correct += 1
-            counter += 1
+                correct_counter[gt_label] = correct_counter.get(
+                    gt_label, 0) + 1
+            total_counter[gt_label] = total_counter.get(gt_label, 0) + 1
 
         # Compute accuracy
-        if counter == 0:
-            return 0.0
-        return nb_correct / counter
+        for label in total_counter:
+            accuracy[label] = correct_counter[label] / total_counter[label]
+
+        return accuracy
 
     def compute_metrics(self, query_path):
         # List query images
