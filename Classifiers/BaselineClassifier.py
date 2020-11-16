@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 # Local imports
 import utils
-import constants
+from utils import constants
 
 
 ##########################

@@ -12,7 +12,7 @@ from tqdm import tqdm
 from easydict import EasyDict as edict
 
 # Local
-import constants
+from utils import constants
 
 
 ##########################

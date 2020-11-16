@@ -142,11 +142,6 @@ class CustomClassifier(BaselineClassifier):
                 scores[catalog_label] = scores.get(catalog_label, 0) + \
                     scores_matrix[ind, k]
 
-        # Softmax
-        softmax_denom = np.exp(list(scores.values())).sum()
-        scores = {key: np.exp(
-            scores[key]) / softmax_denom for key in scores}
-
         return scores
 
     def predict_query(self, query, score_threshold=None):
