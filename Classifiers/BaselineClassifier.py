@@ -125,7 +125,9 @@ class BaselineClassifier(object):
 
         # Compute accuracy
         for label in total_counter:
-            accuracy[label] = correct_counter[label] / total_counter[label]
+            correct = correct_counter.get(label, 0)
+            total = total_counter[label]
+            accuracy[label] = correct / total
 
         return accuracy
 
