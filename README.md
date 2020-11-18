@@ -1,4 +1,4 @@
-# One Shot Classification
+# Few Shots Classification
 
 ## Description
 
@@ -9,15 +9,15 @@ TODO
 ### Clone
 
 ```
-git clone https://github.com/delmalih/one-shot-classification
-cd one-shot-classification
+git clone https://github.com/delmalih/few-shots-classification
+cd few-shots-classification
 ```
 
 ### Pyenv
 
 ```
-pyenv virtualenv 3.6.12 one-shot-classification
-pyenv local one-shot-classification
+pyenv virtualenv 3.6.12 few-shots-classification
+pyenv local few-shots-classification
 ```
 
 ### Requirements
