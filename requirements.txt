@@ -1,4 +1,5 @@
 tqdm
+autopep8
 pylint
 nmslib
 imutils
