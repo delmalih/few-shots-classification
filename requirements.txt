@@ -1,6 +1,7 @@
 tqdm
 autopep8
 pylint
+pytest
 nmslib
 imutils
 easydict
