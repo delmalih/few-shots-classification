@@ -29,6 +29,6 @@ jobs:
       - name: Lint with pylint
         run: |
           pylint --rcfile=.pylintrc few_shots_clf/
-      - name: Test with pytest
-        run: |
-          pytest
+      # - name: Test with pytest
+      #   run: |
+      #     pytest
