@@ -98,7 +98,8 @@ class BOWClassifier:
         pass
 
     def _save_vocab(self):
-        pass
+        with open(self.config.vocab_path, "wb") as pickle_file:
+            pickle.dump(self.vocab, pickle_file)
 
     def _save_fingerprint(self):
         fingerprint_folder = "/".join(
@@ -109,4 +110,5 @@ class BOWClassifier:
             pickle.dump(self.fingerprint, pickle_file)
 
     def _load_vocab(self):
-        pass
+        with open(self.config.vocab_path, "rb") as pickle_file:
+            self.vocab = pickle.load(pickle_file)
