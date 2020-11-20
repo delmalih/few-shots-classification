@@ -38,6 +38,6 @@ setup(
     packages=["few_shots_clf", "few_shots_clf.test"],
     url="http://pypi.python.org/pypi/few_shots_clf/",
     license="LICENSE.txt",
-    long_description=open("README.txt").read(),
+    long_description=open("README.md").read(),
     install_requires=requirements,
 )
