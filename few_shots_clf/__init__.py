@@ -6,4 +6,7 @@ from .bow_classifier import BOWClassifier
 """ Top-level package for Few Shots Classification Library. """
 
 __author__ = "David El Malih"
-__version__ = "0.0.0"
+__author_email__ = "da.elmalih@gmail.com"
+__version__ = "1.0.0"
+__description__ = "Few Shots Classification Library. " + \
+                  "Classification task from a small amount of data."
