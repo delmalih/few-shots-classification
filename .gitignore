@@ -6,3 +6,4 @@ files/
 build/
 dist/
 few_shots_clf.egg-info/
+__pycache__
