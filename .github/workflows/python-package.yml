@@ -36,3 +36,7 @@ jobs:
       - name: Test with pytest
         run: |
           pytest
+      - name: Upload package to pypi
+        run: |
+          python setup.py sdist
+          twine upload dist/*
