@@ -2,3 +2,7 @@
 files/
 .vscode
 .python-version
+.pytest_cache
+build/
+dist/
+few_shots_clf.egg-info/
