@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python package
+name: few_shots_clf workflow
 
 env:
   PYPI_USER: ${{ secrets.PYPI_USER }}
@@ -9,9 +9,11 @@ env:
 
 on:
   push:
-    branches: [master]
+    branches:
+      - "*"
   pull_request:
-    branches: [master]
+    branches:
+      - "*"
 
 jobs:
   build:
@@ -19,7 +21,6 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6]
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -34,23 +35,37 @@ jobs:
         run: |
           python setup.py build
           python setup.py install
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Lint with pylint
         run: |
           pylint --rcfile=.pylintrc few_shots_clf/
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Test with pytest
         run: |
           pytest
-      - name: Upload package to pypi
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Remmove old dist
         run: |
-          # Remove old dist
           [ -d dist ] && rm -rf dist
-
-          # Build package
+      - name: Build package
+        run: |
           python setup.py check sdist
-
-          # Check
+      - name: Check package
+        run: |
           twine check dist/*
-
-          # Upload to oficial
-
+      - name: Deploy package to pypi
+        run: |
           twine upload --repository-url https://upload.pypi.org/legacy/ -u $PYPI_USER -p $PYPI_PASSWORD dist/*
