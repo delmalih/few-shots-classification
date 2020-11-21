@@ -6,7 +6,7 @@ from .bow_classifier import BOWClassifier
 """ Top-level package for Few Shots Classification Library. """
 
 # Read version
-with open("./__version__.txt", "r") as version_file:
+with open("few_shots_clf/__version__.txt", "r") as version_file:
     version = version_file.read()
 
 __author__ = "David El Malih"
