@@ -32,7 +32,6 @@ jobs:
     steps:
       - name: Install pylint
         run: |
-          apt-get install python-dev
           pip install pylint
       - name: Lint with pylint
         run: |
@@ -43,7 +42,6 @@ jobs:
     steps:
       - name: Install pytest
         run: |
-          apt-get install python-dev
           pip install pytest
       - name: Test with pytest
         run: |
