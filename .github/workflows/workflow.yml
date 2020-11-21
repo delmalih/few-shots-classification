@@ -28,6 +28,7 @@ jobs:
           python setup.py install
   lint:
     needs: build
+    runs-on: ubuntu-latest
     steps:
       - name: Install pylint
         run: |
@@ -38,6 +39,7 @@ jobs:
           pylint --rcfile=.pylintrc few_shots_clf/
   test:
     needs: build
+    runs-on: ubuntu-latest
     steps:
       - name: Install pytest
         run: |
@@ -48,6 +50,7 @@ jobs:
           pytest
   deploy:
     needs: [lint, test]
+    runs-on: ubuntu-latest
     env:
       TWINE_USERNAME: ${{ secrets.PYPI_USER }}
       TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
