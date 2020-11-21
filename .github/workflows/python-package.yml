@@ -38,5 +38,15 @@ jobs:
           pytest
       - name: Upload package to pypi
         run: |
-          python setup.py sdist
-          twine upload dist/*
+          [ -d dist ] && rm -rf dist
+          echo "[distutils]" >> ~/.pypirc
+          echo "index-servers =" >> ~/.pypirc
+          echo "    pypi" >> ~/.pypirc
+          echo "" >> ~/.pypirc
+          echo "[pypi]" >> ~/.pypirc
+          echo "${PYPI_REPO}" >> ~/.pypirc
+          echo "${PYPI_USER}" >> ~/.pypirc
+          echo "${PYPI_PASSWORD}" >> ~/.pypirc
+          python setup.py check sdist bdist
+          python setup.py sdist 
+          twine upload -r pypi dist/*.tar.gz
