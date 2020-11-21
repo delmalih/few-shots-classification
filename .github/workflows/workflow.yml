@@ -21,6 +21,10 @@ jobs:
         run: |
           sudo apt update
           sudo apt install python3.6
+      - name: Clone repository
+        run: |
+          git clone https://github.com/delmalih/few-shots-classification
+          cd few-shots-classification
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
