@@ -3,6 +3,10 @@
 
 name: Python package
 
+env:
+  PYPI_USER: ${{ secrets.PYPI_USER }}
+  PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
 on:
   push:
     branches: [master]
@@ -33,6 +37,20 @@ jobs:
       - name: Lint with pylint
         run: |
           pylint --rcfile=.pylintrc few_shots_clf/
-      # - name: Test with pytest
-      #   run: |
-      #     pytest
+      - name: Test with pytest
+        run: |
+          pytest
+      - name: Upload package to pypi
+        run: |
+          # Remove old dist
+          [ -d dist ] && rm -rf dist
+
+          # Build package
+          python setup.py check sdist
+
+          # Check
+          twine check dist/*
+
+          # Upload to oficial
+
+          twine upload --repository-url https://upload.pypi.org/legacy/ -u $PYPI_USER -p $PYPI_PASSWORD dist/*

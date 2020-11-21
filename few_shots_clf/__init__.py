@@ -7,6 +7,6 @@ from .bow_classifier import BOWClassifier
 
 __author__ = "David El Malih"
 __author_email__ = "da.elmalih@gmail.com"
-__version__ = "1.0.0"
+__version__ = "1.0.3"
 __description__ = "Few Shots Classification Library. " + \
                   "Classification task from a small amount of data."
