@@ -94,3 +94,36 @@ def test_folder_with_one_image():
     # Delete directory
     shutil.rmtree(dir_path)
     shutil.rmtree(TEST_DIRECTORY_PATH)
+
+
+def test_folder_with_multiple_images():
+    """[summary]
+    """
+    # Directory path
+    dir_path = os.path.join(TEST_DIRECTORY_PATH,
+                            "test_folder_with_multiple_images")
+
+    # Create empty dir
+    os.makedirs(dir_path)
+
+    # Number of images
+    nb_images = 10
+
+    # Loop image creation
+    for k in range(nb_images):
+        # Create image
+        img = np.zeros((10, 10, 3))
+
+        # Add image
+        img_path = os.path.join(dir_path, f"tmp{k}.jpg")
+        cv2.imwrite(img_path, img)
+
+    # Get all images from folder
+    paths = get_all_images_from_folder(dir_path)
+
+    # Assert
+    assert len(paths) == 10
+
+    # Delete directory
+    shutil.rmtree(dir_path)
+    shutil.rmtree(TEST_DIRECTORY_PATH)
