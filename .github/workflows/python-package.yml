@@ -3,6 +3,10 @@
 
 name: Python package
 
+env:
+  PYPI_USER: ${{ secrets.PYPI_USER }}
+  PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
 on:
   push:
     branches: [master]
