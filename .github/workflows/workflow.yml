@@ -10,7 +10,7 @@ on:
     branches: "*"
 
 jobs:
-  run:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,15 +26,29 @@ jobs:
         run: |
           python setup.py build
           python setup.py install
+  lint:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Install pylint
+        run: |
+          pip install pylint
       - name: Lint with pylint
         run: |
           pylint --rcfile=.pylintrc few_shots_clf/
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Install pytest
+        run: |
+          pip install pytest
       - name: Test with pytest
         run: |
           pytest
   deploy:
     runs-on: ubuntu-latest
-    needs: run
+    needs: [lint, test]
     env:
       TWINE_USERNAME: ${{ secrets.PYPI_USER }}
       TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
