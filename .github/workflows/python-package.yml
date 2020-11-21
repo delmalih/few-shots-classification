@@ -46,10 +46,11 @@ jobs:
           [ -d dist ] && rm -rf dist
 
           # Build package
-          python setup.py check sdist bdist
+          python setup.py check sdist
 
           # Check
           twine check dist/*
 
           # Upload to oficial
+
           twine upload --repository-url https://upload.pypi.org/legacy/ -u $PYPI_USER -p $PYPI_PASSWORD dist/*

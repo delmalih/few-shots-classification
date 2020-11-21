@@ -54,7 +54,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     license="LICENSE.txt",
     install_requires=requirements,
-    python_requires="==3.6",
+    python_requires=">=3.6, <=3.7",
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
