@@ -11,9 +11,9 @@ def upgrade_version():
         current_version = version_file.read()
 
     # Update version
-    a, b, c = map(int, current_version.split("."))
-    c += 1
-    new_version = f"{a}.{b}.{c}"
+    major, minor, build = map(int, current_version.split("."))
+    build += 1
+    new_version = f"{major}.{minor}.{build}"
 
     # Save version
     with open("few_shots_clf/__version__.txt", "w") as version_file:
