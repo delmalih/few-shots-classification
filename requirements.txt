@@ -5,6 +5,7 @@ nmslib
 imutils
 easydict
 autopep8
+pre-commit
 numpy>=1.15.4
 opencv-python==3.4.2.16
 opencv-contrib-python==3.4.2.16
