@@ -87,9 +87,6 @@ jobs:
       - name: Install twine & setuptools
         run: |
           pip install twine setuptools
-      - name: Remove old dist
-        run: |
-          [ -d dist ] && rm -rf dist
       - name: Build package
         run: |
           python setup.py check sdist
