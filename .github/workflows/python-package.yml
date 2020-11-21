@@ -48,8 +48,10 @@ jobs:
           twine check dist/*
 
           # Try upload in test platform before the oficial
-          twine upload --repository-url https://test.pypi.org/legacy/ --username $PYPI_USER --password $PYPI_PASSWORD dist/*
+          echo ${PYPI_USER}
+          echo ${PYPI_PASSWORD}
+          twine upload --repository-url https://test.pypi.org/legacy/ -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
           pip install --no-deps --index-url https://test.pypi.org/simple/
 
           # Upload to oficial
-          twine upload --repository-url https://upload.pypi.org/legacy/ --username $PYPI_USER --password $PYPI_PASSWORD dist/*
+          twine upload --repository-url https://upload.pypi.org/legacy/ -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
