@@ -11,6 +11,6 @@ with open("few_shots_clf/__version__.txt", "r") as version_file:
 
 __author__ = "David El Malih"
 __author_email__ = "da.elmalih@gmail.com"
-__version__ = version
+__version__ = "1.0.4"
 __description__ = "Few Shots Classification Library. " + \
                   "Classification task from a small amount of data."
