@@ -90,6 +90,9 @@ jobs:
       - name: Install twine & setuptools
         run: |
           pip install twine setuptools
+      - name: Update version
+        run: |
+          python few_shots_clf/__upgrade__.py
       - name: Build package
         run: |
           python setup.py check sdist
