@@ -14,6 +14,7 @@ import numpy as np
 # Local
 from few_shots_clf.utils import get_all_images_from_folder
 from few_shots_clf.test.test_utils import TEST_DIRECTORY_PATH
+from few_shots_clf.test.test_utils import empty_dir
 
 
 ##########################
@@ -24,9 +25,8 @@ from few_shots_clf.test.test_utils import TEST_DIRECTORY_PATH
 def test_empty_folder():
     """[summary]
     """
-    # Create dir
-    if not os.path.exists(TEST_DIRECTORY_PATH):
-        os.makedirs(TEST_DIRECTORY_PATH)
+    # Empty dir
+    empty_dir()
 
     # Get all images from folder
     paths = get_all_images_from_folder(TEST_DIRECTORY_PATH)
@@ -38,9 +38,8 @@ def test_empty_folder():
 def test_folder_with_no_images():
     """[summary]
     """
-    # Create dir
-    if not os.path.exists(TEST_DIRECTORY_PATH):
-        os.makedirs(TEST_DIRECTORY_PATH)
+    # Empty dir
+    empty_dir()
 
     # Add a file
     file_path = os.path.join(TEST_DIRECTORY_PATH, "tmp.txt")
@@ -61,9 +60,8 @@ def test_folder_with_no_images():
 def test_folder_with_one_image():
     """[summary]
     """
-    # Create dir
-    if not os.path.exists(TEST_DIRECTORY_PATH):
-        os.makedirs(TEST_DIRECTORY_PATH)
+    # Empty dir
+    empty_dir()
 
     # Create image
     img = np.zeros((10, 10, 3))
@@ -87,9 +85,8 @@ def test_folder_with_one_image():
 def test_folder_with_multiple_images():
     """[summary]
     """
-    # Create dir
-    if not os.path.exists(TEST_DIRECTORY_PATH):
-        os.makedirs(TEST_DIRECTORY_PATH)
+    # Empty dir
+    empty_dir()
 
     # Number of images
     nb_images = 10
