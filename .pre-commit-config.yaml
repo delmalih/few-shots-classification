@@ -11,6 +11,6 @@ repos:
     hooks:
       - id: pylint
         name: pylint
-        entry: python -m pylint.__main__
+        entry: pylint --rcfile=.pylintrc few_shots_clf/
         language: system
         types: [python]
