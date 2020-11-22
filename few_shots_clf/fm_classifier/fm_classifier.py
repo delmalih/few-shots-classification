@@ -8,8 +8,8 @@
 # Global
 import os
 import pickle
-import nmslib
 import numpy as np
+from annoy import AnnoyIndex
 from easydict import EasyDict as edict
 
 # few_shots_clf
@@ -54,18 +54,17 @@ class FMClassifier:
         self.config = edict({
             "verbose": params.get("verbose", constants.VERBOSE),
             "feature_extractor": params.get("feature_extractor", constants.FEATURE_EXTRACTOR),
+            "feature_dimension": params.get("feature_dimension", constants.FEATURE_DIMENSION),
             "image_size": params.get("image_size", constants.IMAGE_SIZE),
             "keypoint_stride": params.get("keypoint_stride", constants.KEYPOINT_STRIDE),
             "keypoint_sizes": params.get("keypoint_sizes", constants.KEYPOINT_SIZES),
             "matcher_path": params.get("matcher_path", constants.MATCHER_PATH),
+            "matcher_distance": params.get("matcher_distance", constants.MATCHER_DISTANCE),
+            "matcher_n_trees": params.get("matcher_n_trees", constants.MATCHER_N_TREES),
             "scoring": params.get("scoring", constants.SCORING),
             "k_nn": params.get("k_nn", constants.K_NN),
             "fingerprint_path": params.get("fingerprint_path",
                                            constants.FINGERPRINT_PATH),
-            "matcher_index_params": params.get("matcher_index_params",
-                                               constants.MATCHER_INDEX_PARAMS),
-            "matcher_query_params": params.get("matcher_query_params",
-                                               constants.MATCHER_QUERY_PARAMS),
         })
 
     def _get_catalog_images(self, catalog_path):
@@ -98,7 +97,7 @@ class FMClassifier:
         """[summary]
         """
         # Init matcher
-        self.matcher = nmslib.init(method="hnsw", space="l2")
+        self.matcher = AnnoyIndex(self.config.feature_dimension)
 
         # Create or load matcher
         if self._should_create_index():
@@ -117,13 +116,15 @@ class FMClassifier:
         # Get descriptors
         catalog_descriptors = self._get_catalog_descriptors()
 
+        # Get iterator
+        descriptors_iterator = utils.get_iterator(catalog_descriptors,
+                                                  verbose=self.config.verbose,
+                                                  description="Creating Index...")
+
         # Config matcher
-        if self.config.verbose:
-            print("Creating Index ...")
-        self.matcher.addDataPointBatch(catalog_descriptors)
-        self.matcher.createIndex(self.config.matcher_index_params,
-                                 print_progress=self.config.verbose)
-        self.matcher.setQueryTimeParams(self.config.matcher_query_params)
+        for k, descriptor in enumerate(descriptors_iterator):
+            self.matcher.add_item(k, descriptor)
+        self.matcher.build(self.config.matcher_n_trees)
 
     def _get_catalog_descriptors(self):
         # Init descriptors list
@@ -166,7 +167,14 @@ class FMClassifier:
         matcher_folder = "/".join(self.config.matcher_path.split("/")[:-1])
         if not os.path.exists(matcher_folder):
             os.makedirs(matcher_folder)
-        self.matcher.saveIndex(self.config.matcher_path)
+        if self.config.verbose:
+            print("Saving Index...")
+        self.matcher.save(self.config.matcher_path)
+
+    def _load_matcher_index(self):
+        if self.config.verbose:
+            print("Loading Index...")
+        self.matcher.load(self.config.matcher_path)
 
     def _save_fingerprint(self):
         fingerprint_folder = "/".join(
@@ -175,11 +183,6 @@ class FMClassifier:
             os.makedirs(fingerprint_folder)
         with open(self.config.fingerprint_path, "wb") as pickle_file:
             pickle.dump(self.fingerprint, pickle_file)
-
-    def _load_matcher_index(self):
-        if self.config.verbose:
-            print("Loading Index...")
-        self.matcher.loadIndex(self.config.matcher_path)
 
     ##########################
     # Predict
@@ -245,6 +248,23 @@ class FMClassifier:
 
         return scores
 
+    def scores2label(self, scores):
+        """[summary]
+
+        Args:
+            scores ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        # Get max score
+        max_score = np.max(scores)
+
+        # Get label
+        label = self.catalog_labels[np.argmax(scores)]
+
+        return label, max_score
+
     def _get_query_scores(self, query_descriptors):
         # Init scores variables
         scores = np.zeros((len(self.catalog_labels)))
@@ -260,7 +280,7 @@ class FMClassifier:
         for ind, nn_train_idx in enumerate(train_idx):
             for k, idx in enumerate(nn_train_idx):
                 # Get image_path
-                image_path = self.catalog_images[idx // n_desc]
+                image_path = self.catalog_images[int(idx // n_desc)]
 
                 # Get image_label
                 image_label = self.catalog_images2labels[image_path]
@@ -274,14 +294,19 @@ class FMClassifier:
         return scores
 
     def _compute_query_matches(self, query_descriptors):
-        # Compute matches
-        matches = self.matcher.knnQueryBatch(
-            query_descriptors,
-            k=self.config.k_nn)
+        # Init matches variables
+        n_matches = query_descriptors.shape[0]
+        train_idx = np.zeros((n_matches, self.config.k_nn))
+        distances = np.zeros((n_matches, self.config.k_nn))
 
-        # Separate matches into train_idx and distances
-        train_idx = np.array([m[0] for m in matches])
-        distances = np.array([m[1] for m in matches])
+        # Compute matches
+        for i, descriptor in enumerate(query_descriptors):
+            idx, dist = self.matcher.get_nns_by_vector(
+                descriptor,
+                self.config.k_nn,
+                include_distances=True)
+            train_idx[i] = idx
+            distances[i] = dist
 
         return train_idx, distances
 
