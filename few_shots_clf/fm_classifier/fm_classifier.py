@@ -97,7 +97,8 @@ class FMClassifier:
         """[summary]
         """
         # Init matcher
-        self.matcher = AnnoyIndex(self.config.feature_dimension)
+        self.matcher = AnnoyIndex(self.config.feature_dimension,
+                                  self.config.matcher_distance)
 
         # Create or load matcher
         if self._should_create_index():
@@ -343,7 +344,7 @@ class FMClassifier:
         return self._compute_scores_matrix_distance(distances)
 
     def _compute_scores_matrix_distance(self, distances):
-        return np.exp(-distances)
+        return np.exp(-distances ** 2)
 
     def _compute_scores_matrix_count(self, distances):
         scores_matrix = np.zeros(distances.shape)

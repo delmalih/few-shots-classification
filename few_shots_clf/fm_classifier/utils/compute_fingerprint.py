@@ -12,6 +12,7 @@ import numpy as np
 
 # Local
 from few_shots_clf.utils import get_all_images_from_folder
+from few_shots_clf.utils import get_iterator
 
 
 ##########################
@@ -30,7 +31,8 @@ def compute_fingerprint(catalog_path, config):
         [type]: [description]
     """
     # Catalog fingerprint
-    catalog_fingerprint = _compute_catalog_fingerprint(catalog_path)
+    catalog_fingerprint = _compute_catalog_fingerprint(catalog_path,
+                                                       verbose=config.verbose)
 
     # Config fingerprint
     config_fingerprint = _compute_config_fingerprint(config)
@@ -42,15 +44,21 @@ def compute_fingerprint(catalog_path, config):
     return fingerprint
 
 
-def _compute_catalog_fingerprint(catalog_path):
+def _compute_catalog_fingerprint(catalog_path, verbose=True):
     # Init. catalog fingerprint
     catalog_fingerprint = ""
 
     # Get all paths
     image_paths = get_all_images_from_folder(catalog_path)
 
+    # Iterator
+    iterator = get_iterator(
+        image_paths,
+        verbose=verbose,
+        description="Computing fingerprint...")
+
     # Loop over image_paths
-    for image_path in image_paths:
+    for image_path in iterator:
         # Hash image_path
         path_hash = sha224(str.encode(image_path)).hexdigest()
 

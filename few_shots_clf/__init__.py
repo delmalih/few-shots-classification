@@ -1,5 +1,6 @@
 # pylint: disable=pointless-string-statement
 
+from . import utils
 from .fm_classifier import FMClassifier
 
 """ Top-level package for Few Shots Classification Library. """

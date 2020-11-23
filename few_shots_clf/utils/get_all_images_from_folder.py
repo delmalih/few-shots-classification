@@ -15,11 +15,11 @@ import cv2
 ##########################
 
 
-def get_all_images_from_folder(catalog_path):
+def get_all_images_from_folder(path):
     """[summary]
 
     Args:
-        catalog_path ([type]): [description]
+        path ([type]): [description]
 
     Returns:
         [type]: [description]
@@ -28,10 +28,11 @@ def get_all_images_from_folder(catalog_path):
     image_paths = []
 
     # Loop over all sub-folders and sub-files
-    for root, _, files in os.walk(catalog_path):
+    for root, _, files in os.walk(path):
 
         # Loop over all sub-files
         for img_filename in files:
+            # print(type(img_filename))
 
             # Get final file path
             file_path = os.path.join(root, img_filename)
