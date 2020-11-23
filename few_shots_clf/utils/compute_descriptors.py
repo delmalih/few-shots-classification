@@ -14,5 +14,17 @@ def compute_descriptors(img, keypoints, feature_extractor):
     Returns:
         [type]: [description]
     """
-    _, descriptors = feature_extractor.compute(img, keypoints)
+    # Extract B, G, R
+    img_b = img[:, :, 0]
+    img_g = img[:, :, 1]
+    img_r = img[:, :, 1]
+
+    # Extract descriptors
+    _, descriptors_b = feature_extractor.compute(img_b, keypoints)
+    _, descriptors_g = feature_extractor.compute(img_g, keypoints)
+    _, descriptors_r = feature_extractor.compute(img_r, keypoints)
+
+    # Compute mean
+    descriptors = (descriptors_b + descriptors_g + descriptors_r) / 3
+
     return descriptors
