@@ -17,7 +17,7 @@ import few_shots_clf
 
 # Install requirements
 with open("./requirements.txt", "r") as requirements_file:
-    requirements = requirements_file.read().split("\n")
+    requirements = requirements_file.read().split("\n")[:-1]
 
 
 # Long description
