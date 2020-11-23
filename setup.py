@@ -16,18 +16,8 @@ import few_shots_clf
 
 
 # Install requirements
-requirements = [
-    "tqdm",
-    "autopep8",
-    "pylint",
-    "pytest",
-    "nmslib",
-    "imutils",
-    "easydict",
-    "numpy >= 1.15.4",
-    "opencv-python == 3.4.2.16",
-    "opencv-contrib-python == 3.4.2.16",
-]
+with open("./requirements.txt", "r") as requirements_file:
+    requirements = requirements_file.read().split("\n")[:-1]
 
 
 # Long description
@@ -54,12 +44,10 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     license="LICENSE.txt",
     install_requires=requirements,
-    python_requires=">=3.6, <=3.7",
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
     ],
     keywords=[
         "FEW-SHOTS",

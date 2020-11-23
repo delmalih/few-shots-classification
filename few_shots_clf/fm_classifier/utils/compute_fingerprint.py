@@ -80,24 +80,24 @@ def _compute_config_fingerprint(config):
     config_fingerprint = ""
 
     # Add feature_extractor
-    config_fingerprint = f"{config_fingerprint}{str(config.feature_extractor)}"
+    config_fingerprint = f"{config_fingerprint}{str(config.feature_extractor.getDefaultName())}"
+
+    # Add feature_dimension
+    config_fingerprint = f"{config_fingerprint}{config.feature_dimension}"
 
     # Add image_size
-    config_fingerprint = f"{config_fingerprint}{str(config.image_size)}"
+    config_fingerprint = f"{config_fingerprint}{config.image_size}"
 
     # Add keypoint_stride
-    config_fingerprint = f"{config_fingerprint}{str(config.keypoint_stride)}"
+    config_fingerprint = f"{config_fingerprint}{config.keypoint_stride}"
 
     # Add keypoint_sizes
     config_fingerprint = f"{config_fingerprint}{str(config.keypoint_sizes)}"
 
-    # Add scoring
-    config_fingerprint = f"{config_fingerprint}{str(config.scoring)}"
+    # Add matcher_distance
+    config_fingerprint = f"{config_fingerprint}{config.matcher_distance}"
 
-    # Add k_nn
-    config_fingerprint = f"{config_fingerprint}{str(config.k_nn)}"
-
-    # Compute fingerprint
-    config_fingerprint = sha224(str.encode(config_fingerprint)).hexdigest()
+    # Add matcher_n_trees
+    config_fingerprint = f"{config_fingerprint}{config.matcher_n_trees}"
 
     return config_fingerprint
