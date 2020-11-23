@@ -265,6 +265,31 @@ class FMClassifier:
 
         return label, max_score
 
+    def scores2labels(self, scores_list):
+        """[summary]
+
+        Args:
+            scores_list ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        # Init labels
+        labels = []
+
+        # Get iterator
+        scores_iterator = utils.get_iterator(
+            scores_list,
+            verbose=self.config.verbose,
+            description="Getting labels...")
+
+        # Get labels from scores
+        for scores in scores_iterator:
+            label = self.scores2label(scores)
+            labels.append(label)
+
+        return labels
+
     def _get_query_scores(self, query_descriptors):
         # Init scores variables
         scores = np.zeros((len(self.catalog_labels)))
