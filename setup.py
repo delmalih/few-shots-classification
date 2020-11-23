@@ -16,18 +16,8 @@ import few_shots_clf
 
 
 # Install requirements
-requirements = [
-    "tqdm",
-    "autopep8",
-    "pylint",
-    "pytest",
-    "nmslib",
-    "imutils",
-    "easydict",
-    "numpy >= 1.15.4",
-    "opencv-python == 3.4.2.16",
-    "opencv-contrib-python == 3.4.2.16",
-]
+with open("./requirements.txt", "r") as requirements_file:
+    requirements = requirements_file.read().split("\n")
 
 
 # Long description
