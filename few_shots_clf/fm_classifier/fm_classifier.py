@@ -53,7 +53,7 @@ class FMClassifier:
     def _get_classifier_config(self, params):
         self.config = edict({
             "verbose": params.get("verbose", constants.VERBOSE),
-            "feature_extractor": params.get("feature_extractor", constants.FEATURE_EXTRACTOR),
+            "feature_descriptor": params.get("feature_descriptor", constants.FEATURE_DESCRIPTOR),
             "feature_dimension": params.get("feature_dimension", constants.FEATURE_DIMENSION),
             "image_size": params.get("image_size", constants.IMAGE_SIZE),
             "keypoint_stride": params.get("keypoint_stride", constants.KEYPOINT_STRIDE),
@@ -97,7 +97,8 @@ class FMClassifier:
         """[summary]
         """
         # Init matcher
-        self.matcher = AnnoyIndex(self.config.feature_dimension)
+        self.matcher = AnnoyIndex(self.config.feature_dimension,
+                                  self.config.matcher_distance)
 
         # Create or load matcher
         if self._should_create_index():
@@ -151,7 +152,7 @@ class FMClassifier:
             descriptors = utils.compute_descriptors(
                 img,
                 keypoints,
-                self.config.feature_extractor)
+                self.config.feature_descriptor)
 
             # Update descriptors list
             catalog_descriptors.append(descriptors)
@@ -208,7 +209,7 @@ class FMClassifier:
         # Get descriptors
         query_descriptors = utils.compute_descriptors(query_img,
                                                       query_keypoints,
-                                                      self.config.feature_extractor)
+                                                      self.config.feature_descriptor)
 
         # Get scores
         scores = self._get_query_scores(query_descriptors)
@@ -247,48 +248,6 @@ class FMClassifier:
         scores = np.array(scores)
 
         return scores
-
-    def scores2label(self, scores):
-        """[summary]
-
-        Args:
-            scores ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        # Get max score
-        max_score = np.max(scores)
-
-        # Get label
-        label = self.catalog_labels[np.argmax(scores)]
-
-        return label, max_score
-
-    def scores2labels(self, scores_list):
-        """[summary]
-
-        Args:
-            scores_list ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        # Init labels
-        labels = []
-
-        # Get iterator
-        scores_iterator = utils.get_iterator(
-            scores_list,
-            verbose=self.config.verbose,
-            description="Getting labels...")
-
-        # Get labels from scores
-        for scores in scores_iterator:
-            label = self.scores2label(scores)
-            labels.append(label)
-
-        return labels
 
     def _get_query_scores(self, query_descriptors):
         # Init scores variables
@@ -343,10 +302,64 @@ class FMClassifier:
         return self._compute_scores_matrix_distance(distances)
 
     def _compute_scores_matrix_distance(self, distances):
-        return np.exp(-distances)
+        return np.exp(-distances ** 2)
 
     def _compute_scores_matrix_count(self, distances):
         scores_matrix = np.zeros(distances.shape)
         for k in range(self.config.k_nn):
-            scores_matrix[:, k] = self.config.k_nn - k
+            scores_matrix[:, k] = 1 - k / self.config.k_nn
         return scores_matrix
+
+    ##########################
+    # Metrics & Scores
+    ##########################
+
+    def score(self, query_paths, gt_labels):
+        """[summary]
+
+        Args:
+            query_paths ([type]): [description]
+            gt_labels ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        # Predict labels
+        pred_scores = self.predict_batch(query_paths)
+        pred_labels = np.argmax(pred_scores, axis=-1)
+
+        # Accuracy
+        gt_labels = np.array(gt_labels)
+        nb_correct = (pred_labels == gt_labels).sum()
+        nb_total = len(pred_labels)
+        accuracy = nb_correct / nb_total
+
+        return accuracy
+
+    ##########################
+    # Utils
+    ##########################
+
+    def label_id2str(self, label_id):
+        """[summary]
+
+        Args:
+            label_id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        return self.catalog_labels[label_id]
+
+    def label_str2id(self, label_str):
+        """[summary]
+
+        Args:
+            label_str ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        if label_str in self.catalog_labels:
+            return self.catalog_labels.index(label_str)
+        return -1
