@@ -1,15 +1,23 @@
 ##########################
+# Imports
+##########################
+
+
+import numpy as np
+
+
+##########################
 # Function
 ##########################
 
 
-def compute_descriptors(img, keypoints, feature_extractor):
+def compute_descriptors(img, keypoints, feature_descriptor):
     """[summary]
 
     Args:
         img ([type]): [description]
         keypoints ([type]): [description]
-        feature_extractor ([type]): [description]
+        feature_descriptor ([type]): [description]
 
     Returns:
         [type]: [description]
@@ -20,11 +28,14 @@ def compute_descriptors(img, keypoints, feature_extractor):
     img_r = img[:, :, 1]
 
     # Extract descriptors
-    _, descriptors_b = feature_extractor.compute(img_b, keypoints)
-    _, descriptors_g = feature_extractor.compute(img_g, keypoints)
-    _, descriptors_r = feature_extractor.compute(img_r, keypoints)
+    _, descriptors_b = feature_descriptor.compute(img_b, keypoints)
+    _, descriptors_g = feature_descriptor.compute(img_g, keypoints)
+    _, descriptors_r = feature_descriptor.compute(img_r, keypoints)
 
-    # Compute mean
-    descriptors = (descriptors_b + descriptors_g + descriptors_r) / 3
+    # Concatenate
+    descriptors = np.concatenate((descriptors_b,
+                                  descriptors_g,
+                                  descriptors_r),
+                                 axis=-1)
 
     return descriptors

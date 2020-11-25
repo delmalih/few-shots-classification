@@ -53,7 +53,7 @@ class FMClassifier:
     def _get_classifier_config(self, params):
         self.config = edict({
             "verbose": params.get("verbose", constants.VERBOSE),
-            "feature_extractor": params.get("feature_extractor", constants.FEATURE_EXTRACTOR),
+            "feature_descriptor": params.get("feature_descriptor", constants.FEATURE_DESCRIPTOR),
             "feature_dimension": params.get("feature_dimension", constants.FEATURE_DIMENSION),
             "image_size": params.get("image_size", constants.IMAGE_SIZE),
             "keypoint_stride": params.get("keypoint_stride", constants.KEYPOINT_STRIDE),
@@ -152,7 +152,7 @@ class FMClassifier:
             descriptors = utils.compute_descriptors(
                 img,
                 keypoints,
-                self.config.feature_extractor)
+                self.config.feature_descriptor)
 
             # Update descriptors list
             catalog_descriptors.append(descriptors)
@@ -209,7 +209,7 @@ class FMClassifier:
         # Get descriptors
         query_descriptors = utils.compute_descriptors(query_img,
                                                       query_keypoints,
-                                                      self.config.feature_extractor)
+                                                      self.config.feature_descriptor)
 
         # Get scores
         scores = self._get_query_scores(query_descriptors)
@@ -307,7 +307,7 @@ class FMClassifier:
     def _compute_scores_matrix_count(self, distances):
         scores_matrix = np.zeros(distances.shape)
         for k in range(self.config.k_nn):
-            scores_matrix[:, k] = self.config.k_nn - k
+            scores_matrix[:, k] = 1 - k / self.config.k_nn
         return scores_matrix
 
     ##########################

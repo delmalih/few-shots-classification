@@ -87,8 +87,8 @@ def _compute_config_fingerprint(config):
     # Init config fingerprint
     config_fingerprint = ""
 
-    # Add feature_extractor
-    config_fingerprint = f"{config_fingerprint}{str(config.feature_extractor.getDefaultName())}"
+    # Add feature_descriptor
+    config_fingerprint = f"{config_fingerprint}{str(config.feature_descriptor.getDefaultName())}"
 
     # Add feature_dimension
     config_fingerprint = f"{config_fingerprint}{config.feature_dimension}"

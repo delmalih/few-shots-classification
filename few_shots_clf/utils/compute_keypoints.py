@@ -33,7 +33,6 @@ def compute_keypoints(img, kpt_stride, kpt_sizes):
             # Loop over y
             for y_coord in range(0, img.shape[0], kpt_stride):
                 kpt = cv2.KeyPoint(x_coord, y_coord, size)
-                kpt.class_id = 0
                 keypoints.append(kpt)
 
     return keypoints
