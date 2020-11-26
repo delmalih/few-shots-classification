@@ -9,3 +9,4 @@ few_shots_clf.egg-info/
 __pycache__
 tmp.py
 .DS_Store
+.coverage
