@@ -7,7 +7,7 @@
 import os
 
 # Local
-from few_shots_clf.test import TEST_DIRECTORY_PATH as DIR_PATH
+from few_shots_clf.test.test_fm_classifier import TEST_DIRECTORY_PATH as DIR_PATH
 
 
 ##########################

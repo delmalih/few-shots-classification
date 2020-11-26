@@ -4,6 +4,7 @@ numpy
 pylint
 pytest
 imutils
+coverage
 easydict
 autopep8
 pre-commit
