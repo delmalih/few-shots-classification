@@ -69,16 +69,6 @@ jobs:
       - name: Test with pytest
         run: |
           pytest
-  coverage:
-    needs: test
-    runs-on: ubuntu-latest
-    name: coverage
-    steps:
-      - uses: actions/checkout@master
-      - uses: codecov/codecov-action@v1
-        with:
-          fail_ci_if_error: true
-          verbose: true
   deploy:
     needs: [lint, test]
     runs-on: ubuntu-latest
