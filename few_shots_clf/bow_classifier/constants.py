@@ -36,6 +36,9 @@ FINGERPRINT_PATH = os.path.join(TMP_FOLDER_PATH,
 VOCAB_PATH = os.path.join(TMP_FOLDER_PATH,
                           "vocab.pickle")
 
+CATALOG_FEATURES_PATH = os.path.join(TMP_FOLDER_PATH,
+                                     "catalog_features_path.pickle")
+
 # MATCHER_DISTANCE = "angular"
 
 # MATCHER_N_TREES = 10

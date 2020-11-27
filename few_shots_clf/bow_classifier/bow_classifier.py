@@ -12,6 +12,7 @@ import numpy as np
 from annoy import AnnoyIndex
 from easydict import EasyDict as edict
 from sklearn.cluster import MiniBatchKMeans
+import sklearn.metrics.pairwise as sklearn_pairwise
 
 # few_shots_clf
 from few_shots_clf import utils
@@ -61,6 +62,8 @@ class BOWClassifier:
             "keypoint_sizes": params.get("keypoint_sizes", constants.KEYPOINT_SIZES),
             "vocab_path": params.get("vocab_path",
                                      constants.VOCAB_PATH),
+            "catalog_features_path": params.get("catalog_features_path",
+                                                constants.CATALOG_FEATURES_PATH),
             "fingerprint_path": params.get("fingerprint_path",
                                            constants.FINGERPRINT_PATH),
         })
@@ -101,10 +104,13 @@ class BOWClassifier:
         # Create or load matcher
         if self._should_create_vocab():
             self._create_vocab()
+            self._create_catalog_features()
             self._save_vocab()
+            self._save_catalog_features()
             self._save_fingerprint()
         else:
             self._load_vocab()
+            self._load_catalog_features()
 
     def _should_create_vocab(self):
         fingerprint_changed = self.config.fingerprint != self.fingerprint
@@ -187,6 +193,58 @@ class BOWClassifier:
             idf_den = len(len(catalog_images_in_cluster))
             self.vocab["idf"][cluster] = np.log(idf_num / idf_den)
 
+    def _create_catalog_features(self):
+        # Init catalog_features
+        self.catalog_features = []
+
+        # Init iterator
+        iterator = utils.get_iterator(self.catalog_images,
+                                      verbose=self.config.verbose,
+                                      description="Computing catalog features")
+
+        # Compute catalog features
+        for image_path in iterator:
+            # Read image
+            img = utils.read_image(image_path,
+                                   size=self.config.image_size)
+
+            # Compute features
+            features = self._compute_catalog_image_features(img)
+
+            # Update catalog_features list
+            self.catalog_features.append(features)
+
+        # To numpy
+        self.catalog_features = np.array(self.catalog_features)
+
+    def _compute_catalog_image_features(self, image):
+        # Get keypoints
+        keypoints = utils.get_keypoints(image,
+                                        self.config.keypoint_stride,
+                                        self.config.keypoint_sizes)
+
+        # Get descriptors
+        descriptors = utils.get_descriptors(image,
+                                            keypoints,
+                                            self.config.feature_extractor)
+
+        # Compute distances between
+        # descriptors and vocab features
+        distances = sklearn_pairwise.pairwise_distances(descriptors,
+                                                        self.vocab["features"],
+                                                        metric="cosine")
+
+        # Compute softmax scores
+        scores = np.exp(1. - distances)
+        softmax_scores = scores / np.sum(scores, axis=-1, keepdims=True)
+
+        # Compute features
+        features_num = np.sum(softmax_scores, axis=0)
+        features_den = len(softmax_scores)
+        features = self.vocab["idf"] * features_num / features_den
+
+        return features
+
     def _save_vocab(self):
         vocab_folder = "/".join(self.config.vocab_path.split("/")[:-1])
         if not os.path.exists(vocab_folder):
@@ -196,12 +254,15 @@ class BOWClassifier:
         with open(self.config.vocab_path, "wb") as pickle_file:
             pickle.dump(self.vocab, pickle_file)
 
-    def _load_vocab(self):
+    def _save_catalog_features(self):
+        catalog_features_folder = "/".join(
+            self.config.catalog_features_path.split("/")[:-1])
+        if not os.path.exists(catalog_features_folder):
+            os.makedirs(catalog_features_folder)
         if self.config.verbose:
-            print("Loading Vocab...")
-        with open(self.config.vocab_path, "rb") as pickle_file:
-            self.vocab = pickle.load(pickle_file)
-        self.matcher.load(self.config.matcher_path)
+            print("Saving Catalog Features...")
+        with open(self.config.catalog_features_path, "wb") as pickle_file:
+            pickle.dump(self.catalog_features, pickle_file)
 
     def _save_fingerprint(self):
         fingerprint_folder = "/".join(
@@ -210,6 +271,18 @@ class BOWClassifier:
             os.makedirs(fingerprint_folder)
         with open(self.config.fingerprint_path, "wb") as pickle_file:
             pickle.dump(self.fingerprint, pickle_file)
+
+    def _load_vocab(self):
+        if self.config.verbose:
+            print("Loading Vocab...")
+        with open(self.config.vocab_path, "rb") as pickle_file:
+            self.vocab = pickle.load(pickle_file)
+
+    def _load_catalog_features(self):
+        if self.config.verbose:
+            print("Loading Catalog Features...")
+        with open(self.config.catalog_features_path, "rb") as pickle_file:
+            self.vocab = pickle.load(pickle_file)
 
     ##########################
     # Predict
