@@ -54,8 +54,8 @@ def compute_config_fingerprint(config):
     # Add feature_descriptor
     config_fingerprint = f"{config_fingerprint}{str(config.feature_descriptor.getDefaultName())}"
 
-    # Add feature_dimension
-    config_fingerprint = f"{config_fingerprint}{config.feature_dimension}"
+    # Add feature_descriptor
+    config_fingerprint = f"{config_fingerprint}{str(config.vocab_size)}"
 
     # Add image_size
     config_fingerprint = f"{config_fingerprint}{config.image_size}"
@@ -65,11 +65,5 @@ def compute_config_fingerprint(config):
 
     # Add keypoint_sizes
     config_fingerprint = f"{config_fingerprint}{str(config.keypoint_sizes)}"
-
-    # Add matcher_distance
-    config_fingerprint = f"{config_fingerprint}{config.matcher_distance}"
-
-    # Add matcher_n_trees
-    config_fingerprint = f"{config_fingerprint}{config.matcher_n_trees}"
 
     return config_fingerprint

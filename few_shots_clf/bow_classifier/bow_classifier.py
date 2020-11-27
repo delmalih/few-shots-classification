@@ -11,19 +11,20 @@ import pickle
 import numpy as np
 from annoy import AnnoyIndex
 from easydict import EasyDict as edict
+from sklearn.cluster import MiniBatchKMeans
 
 # few_shots_clf
 from few_shots_clf import utils
 from few_shots_clf.fm_classifier import constants
-from few_shots_clf.fm_classifier import utils as fm_utils
+from few_shots_clf.fm_classifier import utils as bow_utils
 
 
 ##########################
-# FMClassifier
+# BOWClassifier
 ##########################
 
 
-class FMClassifier:
+class BOWClassifier:
     """[summary]
 
     Args:
@@ -54,15 +55,12 @@ class FMClassifier:
         self.config = edict({
             "verbose": params.get("verbose", constants.VERBOSE),
             "feature_descriptor": params.get("feature_descriptor", constants.FEATURE_DESCRIPTOR),
-            "feature_dimension": params.get("feature_dimension", constants.FEATURE_DIMENSION),
+            "vocab_size": params.get("vocab_size", constants.VOCAB_SIZE),
             "image_size": params.get("image_size", constants.IMAGE_SIZE),
             "keypoint_stride": params.get("keypoint_stride", constants.KEYPOINT_STRIDE),
             "keypoint_sizes": params.get("keypoint_sizes", constants.KEYPOINT_SIZES),
-            "matcher_path": params.get("matcher_path", constants.MATCHER_PATH),
-            "matcher_distance": params.get("matcher_distance", constants.MATCHER_DISTANCE),
-            "matcher_n_trees": params.get("matcher_n_trees", constants.MATCHER_N_TREES),
-            "scoring": params.get("scoring", constants.SCORING),
-            "k_nn": params.get("k_nn", constants.K_NN),
+            "vocab_path": params.get("vocab_path",
+                                     constants.VOCAB_PATH),
             "fingerprint_path": params.get("fingerprint_path",
                                            constants.FINGERPRINT_PATH),
         })
@@ -86,8 +84,8 @@ class FMClassifier:
             self.config.fingerprint = ""
 
         # Current fingerprint
-        self.fingerprint = fm_utils.compute_fingerprint(self.catalog_path,
-                                                        self.config)
+        self.fingerprint = bow_utils.compute_fingerprint(self.catalog_path,
+                                                         self.config)
 
     ##########################
     # Train
@@ -101,35 +99,42 @@ class FMClassifier:
                                   self.config.matcher_distance)
 
         # Create or load matcher
-        if self._should_create_index():
-            self._create_matcher_index()
-            self._save_matcher_index()
+        if self._should_create_vocab():
+            self._create_vocab()
+            self._save_vocab()
             self._save_fingerprint()
         else:
-            self._load_matcher_index()
+            self._load_vocab()
 
-    def _should_create_index(self):
+    def _should_create_vocab(self):
         fingerprint_changed = self.config.fingerprint != self.fingerprint
-        matcher_file_exists = os.path.isfile(self.config.matcher_path)
-        return fingerprint_changed or (not matcher_file_exists)
+        vocab_file_exists = os.path.isfile(self.config.vocab_path)
+        return fingerprint_changed or (not vocab_file_exists)
 
-    def _create_matcher_index(self):
+    def _create_vocab(self):
+        # Init vocab
+        self.vocab = {}
+
         # Get descriptors
-        catalog_descriptors = self._get_catalog_descriptors()
+        catalog_descriptors, catalog_descriptors_labels = self._get_catalog_descriptors()
 
-        # Get iterator
-        descriptors_iterator = utils.get_iterator(catalog_descriptors,
-                                                  verbose=self.config.verbose,
-                                                  description="Creating Index...")
+        # KMeans
+        if self.config.verbose:
+            print("KMeans step ...")
+        kmeans = MiniBatchKMeans(n_clusters=self.config.vocab_size,
+                                 init_size=3 * self.config.vocab_size)
+        clusters = kmeans.fit_predict(catalog_descriptors)
 
-        # Config matcher
-        for k, descriptor in enumerate(descriptors_iterator):
-            self.matcher.add_item(k, descriptor)
-        self.matcher.build(self.config.matcher_n_trees)
+        # Save features
+        self.vocab["features"] = kmeans.cluster_centers_
+
+        # Build vocab
+        self._build_vocab_idf(clusters, catalog_descriptors_labels)
 
     def _get_catalog_descriptors(self):
         # Init descriptors list
         catalog_descriptors = []
+        catalog_descriptors_labels = []
 
         # Init iterator
         iterator = utils.get_iterator(
@@ -138,7 +143,7 @@ class FMClassifier:
             description="Computing catalog descriptors")
 
         # Compute all descriptors
-        for path in iterator:
+        for k, path in enumerate(iterator):
             # Read image
             img = utils.read_image(path, size=self.config.image_size)
 
@@ -153,28 +158,49 @@ class FMClassifier:
                 img,
                 keypoints,
                 self.config.feature_descriptor)
+            descriptors_labels = [k for _ in range(len(descriptors))]
 
             # Update descriptors list
             catalog_descriptors.append(descriptors)
+            catalog_descriptors_labels.append(descriptors_labels)
 
         # Reshape descriptors list
         catalog_descriptors = np.array(catalog_descriptors)
+        catalog_descriptors_labels = np.array(catalog_descriptors_labels)
         catalog_descriptors = catalog_descriptors.reshape(
             -1, catalog_descriptors.shape[-1])
+        catalog_descriptors_labels = catalog_descriptors_labels.reshape(
+            -1, catalog_descriptors_labels.shape[-1])
 
-        return catalog_descriptors
+        return catalog_descriptors, catalog_descriptors_labels
 
-    def _save_matcher_index(self):
-        matcher_folder = "/".join(self.config.matcher_path.split("/")[:-1])
-        if not os.path.exists(matcher_folder):
-            os.makedirs(matcher_folder)
+    def _build_vocab_idf(self, clusters, descriptors_labels):
+        # Compute IDF
+        self.vocab["idf"] = np.zeros((self.vocab["features"].shape[0],))
+        for cluster in set(clusters):
+            # Get images of cluster
+            catalog_images_in_cluster = set(
+                descriptors_labels[clusters == cluster])
+
+            # Compute cluster IDF
+            idf_num = len(self.catalog_images_paths)
+            idf_den = len(len(catalog_images_in_cluster))
+            self.vocab["idf"][cluster] = np.log(idf_num / idf_den)
+
+    def _save_vocab(self):
+        vocab_folder = "/".join(self.config.vocab_path.split("/")[:-1])
+        if not os.path.exists(vocab_folder):
+            os.makedirs(vocab_folder)
         if self.config.verbose:
-            print("Saving Index...")
-        self.matcher.save(self.config.matcher_path)
+            print("Saving Vocab...")
+        with open(self.config.vocab_path, "wb") as pickle_file:
+            pickle.dump(self.vocab, pickle_file)
 
-    def _load_matcher_index(self):
+    def _load_vocab(self):
         if self.config.verbose:
-            print("Loading Index...")
+            print("Loading Vocab...")
+        with open(self.config.vocab_path, "rb") as pickle_file:
+            self.vocab = pickle.load(pickle_file)
         self.matcher.load(self.config.matcher_path)
 
     def _save_fingerprint(self):
@@ -194,30 +220,8 @@ class FMClassifier:
 
         Args:
             query_path ([type]): [description]
-
-        Returns:
-            [type]: [description]
         """
-        # Read img
-        query_img = utils.read_image(query_path, size=self.config.image_size)
-
-        # Get keypoints
-        query_keypoints = utils.compute_keypoints(query_img,
-                                                  self.config.keypoint_stride,
-                                                  self.config.keypoint_sizes)
-
-        # Get descriptors
-        query_descriptors = utils.compute_descriptors(query_img,
-                                                      query_keypoints,
-                                                      self.config.feature_descriptor)
-
-        # Get scores
-        scores = self._get_query_scores(query_descriptors)
-
-        # To numpy
-        scores = np.array(scores)
-
-        return scores
+        return query_path
 
     def predict_batch(self, query_paths):
         """[summary]
@@ -248,67 +252,6 @@ class FMClassifier:
         scores = np.array(scores)
 
         return scores
-
-    def _get_query_scores(self, query_descriptors):
-        # Init scores variables
-        scores = np.zeros((len(self.catalog_labels)))
-        n_desc = query_descriptors.shape[0]
-
-        # Compute matches
-        train_idx, distances = self._compute_query_matches(query_descriptors)
-
-        # Compute score matrix
-        scores_matrix = self._compute_scores_matrix(distances)
-
-        # Compute final scores
-        for ind, nn_train_idx in enumerate(train_idx):
-            for k, idx in enumerate(nn_train_idx):
-                # Get image_path
-                image_path = self.catalog_images[int(idx // n_desc)]
-
-                # Get image_label
-                image_label = self.catalog_images2labels[image_path]
-
-                # Get label_idx
-                label_idx = self.catalog_labels.index(image_label)
-
-                # Update score
-                scores[label_idx] += scores_matrix[ind, k]
-
-        return scores
-
-    def _compute_query_matches(self, query_descriptors):
-        # Init matches variables
-        n_matches = query_descriptors.shape[0]
-        train_idx = np.zeros((n_matches, self.config.k_nn))
-        distances = np.zeros((n_matches, self.config.k_nn))
-
-        # Compute matches
-        for i, descriptor in enumerate(query_descriptors):
-            idx, dist = self.matcher.get_nns_by_vector(
-                descriptor,
-                self.config.k_nn,
-                include_distances=True)
-            train_idx[i] = idx
-            distances[i] = dist
-
-        return train_idx, distances
-
-    def _compute_scores_matrix(self, distances):
-        if self.config.scoring == "distance":
-            return self._compute_scores_matrix_distance(distances)
-        if self.config.scoring == "count":
-            return self._compute_scores_matrix_count(distances)
-        return self._compute_scores_matrix_distance(distances)
-
-    def _compute_scores_matrix_distance(self, distances):
-        return np.exp(-distances ** 2)
-
-    def _compute_scores_matrix_count(self, distances):
-        scores_matrix = np.zeros(distances.shape)
-        for k in range(self.config.k_nn):
-            scores_matrix[:, k] = 1 - k / self.config.k_nn
-        return scores_matrix
 
     ##########################
     # Metrics & Scores
