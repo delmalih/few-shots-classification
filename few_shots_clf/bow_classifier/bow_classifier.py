@@ -9,15 +9,14 @@
 import os
 import pickle
 import numpy as np
-from annoy import AnnoyIndex
 from easydict import EasyDict as edict
 from sklearn.cluster import MiniBatchKMeans
 import sklearn.metrics.pairwise as sklearn_pairwise
 
 # few_shots_clf
 from few_shots_clf import utils
-from few_shots_clf.fm_classifier import constants
-from few_shots_clf.fm_classifier import utils as bow_utils
+from few_shots_clf.bow_classifier import constants
+from few_shots_clf.bow_classifier import utils as bow_utils
 
 
 ##########################
@@ -97,10 +96,6 @@ class BOWClassifier:
     def train(self):
         """[summary]
         """
-        # Init matcher
-        self.matcher = AnnoyIndex(self.config.feature_dimension,
-                                  self.config.matcher_distance)
-
         # Create or load matcher
         if self._should_create_vocab():
             self._create_vocab()
@@ -175,8 +170,7 @@ class BOWClassifier:
         catalog_descriptors_labels = np.array(catalog_descriptors_labels)
         catalog_descriptors = catalog_descriptors.reshape(
             -1, catalog_descriptors.shape[-1])
-        catalog_descriptors_labels = catalog_descriptors_labels.reshape(
-            -1, catalog_descriptors_labels.shape[-1])
+        catalog_descriptors_labels = catalog_descriptors_labels.reshape(-1)
 
         return catalog_descriptors, catalog_descriptors_labels
 
@@ -189,8 +183,8 @@ class BOWClassifier:
                 descriptors_labels[clusters == cluster])
 
             # Compute cluster IDF
-            idf_num = len(self.catalog_images_paths)
-            idf_den = len(len(catalog_images_in_cluster))
+            idf_num = len(self.catalog_images)
+            idf_den = len(catalog_images_in_cluster)
             self.vocab["idf"][cluster] = np.log(idf_num / idf_den)
 
     def _create_catalog_features(self):
@@ -219,14 +213,14 @@ class BOWClassifier:
 
     def _compute_catalog_image_features(self, image):
         # Get keypoints
-        keypoints = utils.get_keypoints(image,
-                                        self.config.keypoint_stride,
-                                        self.config.keypoint_sizes)
+        keypoints = utils.compute_keypoints(image,
+                                            self.config.keypoint_stride,
+                                            self.config.keypoint_sizes)
 
         # Get descriptors
-        descriptors = utils.get_descriptors(image,
-                                            keypoints,
-                                            self.config.feature_extractor)
+        descriptors = utils.compute_descriptors(image,
+                                                keypoints,
+                                                self.config.feature_descriptor)
 
         # Compute distances between
         # descriptors and vocab features

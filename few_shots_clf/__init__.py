@@ -2,6 +2,7 @@
 
 from . import utils
 from .fm_classifier import FMClassifier
+from .bow_classifier import BOWClassifier
 
 """ Top-level package for Few Shots Classification Library. """
 
