@@ -18,8 +18,6 @@ VERBOSE = True  # boolean (True or False)
 
 FEATURE_DESCRIPTOR = cv2.xfeatures2d.SURF_create(extended=True)
 
-# FEATURE_DIMENSION = 128 * 3
-
 VOCAB_SIZE = 2000  # int
 
 IMAGE_SIZE = 256  # int
@@ -38,15 +36,3 @@ VOCAB_PATH = os.path.join(TMP_FOLDER_PATH,
 
 CATALOG_FEATURES_PATH = os.path.join(TMP_FOLDER_PATH,
                                      "catalog_features_path.pickle")
-
-# MATCHER_DISTANCE = "angular"
-
-# MATCHER_N_TREES = 10
-
-# MATCHER_PATH = os.path.join(TMP_FOLDER_PATH,
-#                             "matcher-classifier-custom.ann")
-
-
-# SCORING = "count"  # Can be "distance" or "count"
-
-# K_NN = 1

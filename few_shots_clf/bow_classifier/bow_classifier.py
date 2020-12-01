@@ -203,41 +203,13 @@ class BOWClassifier:
                                    size=self.config.image_size)
 
             # Compute features
-            features = self._compute_catalog_image_features(img)
+            features = self.compute_image_features(img)
 
             # Update catalog_features list
             self.catalog_features.append(features)
 
         # To numpy
         self.catalog_features = np.array(self.catalog_features)
-
-    def _compute_catalog_image_features(self, image):
-        # Get keypoints
-        keypoints = utils.compute_keypoints(image,
-                                            self.config.keypoint_stride,
-                                            self.config.keypoint_sizes)
-
-        # Get descriptors
-        descriptors = utils.compute_descriptors(image,
-                                                keypoints,
-                                                self.config.feature_descriptor)
-
-        # Compute distances between
-        # descriptors and vocab features
-        distances = sklearn_pairwise.pairwise_distances(descriptors,
-                                                        self.vocab["features"],
-                                                        metric="cosine")
-
-        # Compute softmax scores
-        scores = np.exp(1. - distances)
-        softmax_scores = scores / np.sum(scores, axis=-1, keepdims=True)
-
-        # Compute features
-        features_num = np.sum(softmax_scores, axis=0)
-        features_den = len(softmax_scores)
-        features = self.vocab["idf"] * features_num / features_den
-
-        return features
 
     def _save_vocab(self):
         vocab_folder = "/".join(self.config.vocab_path.split("/")[:-1])
@@ -276,7 +248,7 @@ class BOWClassifier:
         if self.config.verbose:
             print("Loading Catalog Features...")
         with open(self.config.catalog_features_path, "rb") as pickle_file:
-            self.vocab = pickle.load(pickle_file)
+            self.catalog_features = pickle.load(pickle_file)
 
     ##########################
     # Predict
@@ -288,7 +260,37 @@ class BOWClassifier:
         Args:
             query_path ([type]): [description]
         """
-        return query_path
+        # Init scores
+        scores = np.zeros((len(self.catalog_labels)))
+
+        # Read img
+        query_img = utils.read_image(query_path, size=self.config.image_size)
+
+        # Compute features
+        query_features = self.compute_image_features(query_img)
+        query_features = np.expand_dims(query_features, axis=0)
+
+        # Compute distances
+        distance_func = sklearn_pairwise.pairwise_distances
+        query_distances = distance_func(query_features,
+                                        self.catalog_features,
+                                        metric="cosine")[0]
+
+        # Compute scores
+        for idx, distance in enumerate(query_distances):
+            # Get image_path
+            image_path = self.catalog_images[idx]
+
+            # Get image_label
+            image_label = self.catalog_images2labels[image_path]
+
+            # Get label_idx
+            label_idx = self.catalog_labels.index(image_label)
+
+            # Update score
+            scores[label_idx] += (1 - distance)
+
+        return scores
 
     def predict_batch(self, query_paths):
         """[summary]
@@ -373,3 +375,39 @@ class BOWClassifier:
         if label_str in self.catalog_labels:
             return self.catalog_labels.index(label_str)
         return -1
+
+    def compute_image_features(self, image):
+        """[summary]
+
+        Args:
+            image ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        # Get keypoints
+        keypoints = utils.compute_keypoints(image,
+                                            self.config.keypoint_stride,
+                                            self.config.keypoint_sizes)
+
+        # Get descriptors
+        descriptors = utils.compute_descriptors(image,
+                                                keypoints,
+                                                self.config.feature_descriptor)
+
+        # Compute distances between
+        # descriptors and vocab features
+        distances = sklearn_pairwise.pairwise_distances(descriptors,
+                                                        self.vocab["features"],
+                                                        metric="cosine")
+
+        # Compute softmax scores
+        scores = np.exp(1. - distances)
+        softmax_scores = scores / np.sum(scores, axis=-1, keepdims=True)
+
+        # Compute features
+        features_num = np.sum(softmax_scores, axis=0)
+        features_den = len(softmax_scores)
+        features = self.vocab["idf"] * features_num / features_den
+
+        return features
