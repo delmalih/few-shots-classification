@@ -32,8 +32,6 @@ def get_all_images_from_folder(path):
 
         # Loop over all sub-files
         for img_filename in files:
-            # print(type(img_filename))
-
             # Get final file path
             file_path = os.path.join(root, img_filename)
 
