@@ -3,6 +3,11 @@
 ##########################
 
 
+# Built-in
+from typing import List
+
+# Global
+import cv2
 import numpy as np
 
 
@@ -11,16 +16,18 @@ import numpy as np
 ##########################
 
 
-def compute_descriptors(img, keypoints, feature_descriptor):
-    """[summary]
+def compute_descriptors(img: np.array,
+                        keypoints: List[cv2.KeyPoint],
+                        feature_descriptor: cv2.Feature2D) -> np.array:
+    """Computes the descriptors of the given keypoints on the given image.
 
     Args:
-        img ([type]): [description]
-        keypoints ([type]): [description]
-        feature_descriptor ([type]): [description]
+        img (np.array): The input image.
+        keypoints (List[cv2.KeyPoint]): The list of keypoints.
+        feature_descriptor (cv2.Feature2D): The feature descriptor to use.
 
     Returns:
-        [type]: [description]
+        np.array: The matrix of all descriptors.
     """
     # Extract B, G, R
     img_b = img[:, :, 0]
