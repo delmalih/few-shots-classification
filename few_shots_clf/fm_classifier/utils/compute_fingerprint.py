@@ -3,14 +3,12 @@
 ##########################
 
 
-# Built-in
 from hashlib import sha224
+from typing import Dict
 
-# Global
 import cv2
 import numpy as np
 
-# Local
 from few_shots_clf.utils import get_all_images_from_folder
 from few_shots_clf.utils import get_iterator
 
@@ -20,15 +18,15 @@ from few_shots_clf.utils import get_iterator
 ##########################
 
 
-def compute_fingerprint(catalog_path, config):
-    """[summary]
+def compute_fingerprint(catalog_path: str, config: Dict) -> str:
+    """Computes the fingerprint of a the FMClassifier given the catalog path and its config.
 
     Args:
-        catalog_path ([type]): [description]
-        config ([type]): [description]
+        catalog_path (str): The path of the input catalog.
+        config (Dict): The config of the classifier.
 
     Returns:
-        [type]: [description]
+        str: The fingerprint of the classifier.
     """
     # Catalog fingerprint
     catalog_fingerprint = _compute_catalog_fingerprint(catalog_path,
