@@ -28,14 +28,14 @@ with open("README.md", "r") as fh:
 
 
 # Download url
-GITHUB_URL = "https://github.com/delmalih/few-shots-classification"
+GITHUB_URL = "https://github.com/delmalih/few-shots-clf"
 DOWNLOAD_VERSION = few_shots_clf.__version__.replace(".", "")
 DOWNLOAD_URL = f"{GITHUB_URL}/archive/v_{DOWNLOAD_VERSION}.tar.gz"
 
 
 # SETUP
 setuptools.setup(
-    name="few_shots_clf",
+    name="few-shots-clf",
     version=few_shots_clf.__version__,
     author=few_shots_clf.__author__,
     author_email=few_shots_clf.__author_email__,
