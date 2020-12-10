@@ -15,7 +15,7 @@ from tqdm import tqdm
 ##########################
 
 
-def get_iterator(iterator: Iterable, verbose=True, description="") -> Iterable:
+def get_iterator(iterator: Iterable, verbose: bool = True, description: str = "") -> Iterable:
     """Turns a given iterator into a tqdm iterator when verbose is True.
 
     Args:

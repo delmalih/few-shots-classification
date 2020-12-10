@@ -14,7 +14,7 @@ import numpy as np
 ##########################
 
 
-def read_image(path: str, width=None, size=None) -> np.array:
+def read_image(path: str, width: int = None, size: int = None) -> np.array:
     """Reads an image given its path.
 
     Args:
