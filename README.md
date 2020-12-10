@@ -11,5 +11,14 @@ Installation can be done directly from this repository:
 few-shots-clf is available on PyPi as an alpha release. To install it:
 
 ```
+virtualenv venv -p python3.6
 pip install few-shots-clf
 ```
+
+## Quickstart
+
+TODO
+
+## Available Classifiers
+
+TODO
