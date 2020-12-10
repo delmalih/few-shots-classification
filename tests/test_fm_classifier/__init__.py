@@ -5,15 +5,12 @@
 ##########################
 
 
-# Built-in
 import os
 
-# Global
 import cv2
 from easydict import EasyDict as edict
 
-# Local
-from few_shots_clf.test import TEST_DIRECTORY_PATH as DIR_PATH
+from tests import TEST_DIRECTORY_PATH as DIR_PATH
 
 
 ##########################

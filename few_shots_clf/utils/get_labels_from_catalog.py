@@ -3,7 +3,8 @@
 ##########################
 
 
-# Local
+from typing import List
+
 from .get_all_images_from_folder import get_all_images_from_folder
 
 
@@ -12,14 +13,14 @@ from .get_all_images_from_folder import get_all_images_from_folder
 ##########################
 
 
-def get_labels_from_catalog(catalog_path):
-    """[summary]
+def get_labels_from_catalog(catalog_path: str) -> List[str]:
+    """List the labels of a catalog from the catalog path.
 
     Args:
-        catalog_path ([type]): [description]
+        catalog_path (str): The root path the catalog.
 
     Returns:
-        [type]: [description]
+        List[str]: The list of labels sorted alphabetically.
     """
     # Get all images paths
     image_paths = get_all_images_from_folder(catalog_path)

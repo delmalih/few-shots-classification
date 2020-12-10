@@ -3,18 +3,15 @@
 ##########################
 
 
-# Built-in
 import os
 import shutil
 
-# Global
 import cv2
 import numpy as np
 
-# Local
-from few_shots_clf.test import empty_dir
 from few_shots_clf.utils import read_image
-from few_shots_clf.test.test_utils import TEST_DIRECTORY_PATH
+from tests import empty_dir
+from tests.test_utils import TEST_DIRECTORY_PATH
 
 
 ##########################

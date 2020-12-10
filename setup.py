@@ -3,10 +3,8 @@
 ##########################
 
 
-# Global
 import setuptools
 
-# Local
 import few_shots_clf
 
 
@@ -16,8 +14,12 @@ import few_shots_clf
 
 
 # Install requirements
-with open("./requirements.txt", "r") as requirements_file:
+with open("./requirements/requirements.txt", "r") as requirements_file:
     requirements = requirements_file.read().split("\n")[:-1]
+with open("./requirements/requirements-dev.txt", "r") as requirements_file:
+    requirements_dev = requirements_file.read().split("\n")[:-1]
+with open("./requirements/requirements-docs.txt", "r") as requirements_file:
+    requirements_docs = requirements_file.read().split("\n")[:-1]
 
 
 # Long description
@@ -26,13 +28,14 @@ with open("README.md", "r") as fh:
 
 
 # Download url
-GITHUB_URL = "https://github.com/delmalih/few-shots-classification"
+GITHUB_URL = "https://github.com/delmalih/few-shots-clf"
 DOWNLOAD_VERSION = few_shots_clf.__version__.replace(".", "")
 DOWNLOAD_URL = f"{GITHUB_URL}/archive/v_{DOWNLOAD_VERSION}.tar.gz"
 
 
+# SETUP
 setuptools.setup(
-    name="few_shots_clf",
+    name="few-shots-clf",
     version=few_shots_clf.__version__,
     author=few_shots_clf.__author__,
     author_email=few_shots_clf.__author_email__,
@@ -42,14 +45,18 @@ setuptools.setup(
     url=GITHUB_URL,
     download_url=DOWNLOAD_URL,
     packages=setuptools.find_packages(),
-    license="LICENSE.txt",
+    license="MIT",
     install_requires=requirements,
+    extras_require={
+        "dev": requirements_dev,
+        "docs": requirements_docs,
+    },
     python_requires=">=3.6, <3.7",
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.6",
     ],
     keywords=[
         "FEW-SHOTS",

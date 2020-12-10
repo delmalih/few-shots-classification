@@ -3,9 +3,9 @@
 ##########################
 
 
-# Global
 import cv2
 import imutils
+import numpy as np
 
 
 ##########################
@@ -13,16 +13,18 @@ import imutils
 ##########################
 
 
-def read_image(path, width=None, size=None):
-    """[summary]
+def read_image(path: str, width: int = None, size: int = None) -> np.array:
+    """Reads an image given its path.
 
     Args:
-        path ([type]): [description]
-        width ([type], optional): [description]. Defaults to None.
-        size ([type], optional): [description]. Defaults to None.
+        path (str): Path of the image.
+        width (int, optional): Force width to be equal to the given one.
+                               Defaults to None.
+        size (int, optional): Force width and height of the image to be equal to size.
+                              Defaults to None.
 
     Returns:
-        [type]: [description]
+        np.array: The image as a numpy array
     """
     img = cv2.imread(path)
     if width is not None:

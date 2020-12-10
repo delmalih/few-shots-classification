@@ -3,10 +3,8 @@
 ##########################
 
 
-# Global
 from tqdm import tqdm
 
-# Local
 from few_shots_clf.utils import get_iterator
 
 

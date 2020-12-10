@@ -5,26 +5,27 @@
 ##########################
 
 
-# Global
 import os
+from typing import Dict
+from typing import List
+
 import pickle
 import numpy as np
 from annoy import AnnoyIndex
 from easydict import EasyDict as edict
 
-# few_shots_clf
 from few_shots_clf import utils
 from few_shots_clf.fm_classifier import utils as fm_utils
 from few_shots_clf.fm_classifier import constants
 
 
 ##########################
-# fm_classifier
+# FMClassifier
 ##########################
 
 
 class FMClassifier:
-    """[summary]
+    """Class implementing the Features Matching Classifier (FMClassifier)
 
     Args:
         catalog_path (string): [description]
@@ -35,7 +36,7 @@ class FMClassifier:
     # Init
     ##########################
 
-    def __init__(self, catalog_path, params={}):
+    def __init__(self, catalog_path: str, params: Dict = {}):
         self.catalog_path = catalog_path
         self._config_classifier(catalog_path, params)
 
@@ -94,7 +95,7 @@ class FMClassifier:
     ##########################
 
     def train(self):
-        """[summary]
+        """Method used to train the classifier.
         """
         # Init matcher
         self.matcher = AnnoyIndex(self.config.feature_dimension,
@@ -189,14 +190,14 @@ class FMClassifier:
     # Predict
     ##########################
 
-    def predict(self, query_path):
-        """[summary]
+    def predict(self, query_path: str) -> np.array:
+        """Method used to predict a score per class for a given query.
 
         Args:
-            query_path ([type]): [description]
+            query_path (str): The local path of the query.
 
         Returns:
-            [type]: [description]
+            np.array: The list of scores per class.
         """
         # Read img
         query_img = utils.read_image(query_path, size=self.config.image_size)
@@ -219,14 +220,14 @@ class FMClassifier:
 
         return scores
 
-    def predict_batch(self, query_paths):
-        """[summary]
+    def predict_batch(self, query_paths: List[str]) -> np.array:
+        """Method used to predict a class for a batch of queries.
 
         Args:
-            query_paths ([type]): [description]
+            query_paths (List[str]): The list of all query paths.
 
         Returns:
-            [type]: [description]
+            np.array: The scores per class for each query.
         """
         # Init scores
         scores = []
@@ -311,54 +312,28 @@ class FMClassifier:
         return scores_matrix
 
     ##########################
-    # Metrics & Scores
-    ##########################
-
-    def score(self, query_paths, gt_labels):
-        """[summary]
-
-        Args:
-            query_paths ([type]): [description]
-            gt_labels ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        # Predict labels
-        pred_scores = self.predict_batch(query_paths)
-        pred_labels = np.argmax(pred_scores, axis=-1)
-
-        # Accuracy
-        gt_labels = np.array(gt_labels)
-        nb_correct = (pred_labels == gt_labels).sum()
-        nb_total = len(pred_labels)
-        accuracy = nb_correct / nb_total
-
-        return accuracy
-
-    ##########################
     # Utils
     ##########################
 
-    def label_id2str(self, label_id):
-        """[summary]
+    def label_id2str(self, label_id: int) -> str:
+        """Gets the label_str given the label_id.
 
         Args:
-            label_id ([type]): [description]
+            label_id (int): The given label_id.
 
         Returns:
-            [type]: [description]
+            str: The label_str of the given label_id.
         """
         return self.catalog_labels[label_id]
 
-    def label_str2id(self, label_str):
-        """[summary]
+    def label_str2id(self, label_str: str) -> int:
+        """Gets the label_id given the label_str.
 
         Args:
-            label_str ([type]): [description]
+            label_str (str): The given label_str.
 
         Returns:
-            [type]: [description]
+            int: The label_id of the given label_id.
         """
         if label_str in self.catalog_labels:
             return self.catalog_labels.index(label_str)

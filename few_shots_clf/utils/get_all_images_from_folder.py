@@ -3,10 +3,9 @@
 ##########################
 
 
-# Built-in
 import os
+from typing import List
 
-# Global
 import cv2
 
 
@@ -15,14 +14,14 @@ import cv2
 ##########################
 
 
-def get_all_images_from_folder(path):
-    """[summary]
+def get_all_images_from_folder(path: str) -> List[str]:
+    """Lists all image paths contained in a folder.
 
     Args:
-        path ([type]): [description]
+        path (str): The given folder path.
 
     Returns:
-        [type]: [description]
+        List[str]: The list of image paths in the folder.
     """
     # Init paths list
     image_paths = []

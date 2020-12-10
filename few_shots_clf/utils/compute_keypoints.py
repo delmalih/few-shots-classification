@@ -3,8 +3,10 @@
 ##########################
 
 
-# Global
+from typing import List
+
 import cv2
+import numpy as np
 
 
 ##########################
@@ -12,16 +14,16 @@ import cv2
 ##########################
 
 
-def compute_keypoints(img, kpt_stride, kpt_sizes):
-    """[summary]
+def compute_keypoints(img: np.array, kpt_stride: int, kpt_sizes: List[int]) -> List[cv2.KeyPoint]:
+    """Computes evenly-spaced keypoints from a given image.
 
     Args:
-        img ([type]): [description]
-        kpt_stride ([type]): [description]
-        kpt_sizes ([type]): [description]
+        img (np.array): The input image.
+        kpt_stride (int): The stride (spacing) between the keypoints.
+        kpt_sizes (List[int]): A list of keypoint sizes.
 
     Returns:
-        [type]: [description]
+        List[cv2.KeyPoint]: The list of all keypoints.
     """
     # Init keypoints
     keypoints = []

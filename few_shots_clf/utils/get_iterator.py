@@ -1,10 +1,10 @@
-
 ##########################
 # Imports
 ##########################
 
 
-# Global
+from typing import Iterable
+
 from tqdm import tqdm
 
 
@@ -13,16 +13,18 @@ from tqdm import tqdm
 ##########################
 
 
-def get_iterator(iterator, verbose=True, description=""):
-    """[summary]
+def get_iterator(iterator: Iterable, verbose: bool = True, description: str = "") -> Iterable:
+    """Turns a given iterator into a tqdm iterator when verbose is True.
 
     Args:
-        iterator ([type]): [description]
-        verbose (bool, optional): [description]. Defaults to True.
-        description (str, optional): [description]. Defaults to "".
+        iterator (Iterable): The given iterator.
+        verbose (bool, optional): True to turn the iterator into a tqdm one.
+                                  Defaults to True.
+        description (str, optional): The description of the tqdm iterator.
+                                     Defaults to "".
 
     Returns:
-        [type]: [description]
+        Iterable: The iterator tqdmed (or not depending on the verbose variable).
     """
     if verbose:
         iterator = tqdm(iterator, desc=description)

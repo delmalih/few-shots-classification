@@ -3,13 +3,12 @@
 ##########################
 
 
-# Local
-from few_shots_clf.test import empty_dir
-from few_shots_clf.test import build_catalog
-from few_shots_clf.test import delete_catalog
-from few_shots_clf.test.test_fm_classifier import build_config
 from few_shots_clf.fm_classifier.utils import compute_fingerprint
-from few_shots_clf.test.test_fm_classifier.test_utils import TEST_DIRECTORY_PATH
+from tests import empty_dir
+from tests import build_catalog
+from tests import delete_catalog
+from tests.test_fm_classifier import build_config
+from tests.test_fm_classifier.test_utils import TEST_DIRECTORY_PATH
 
 
 ##########################

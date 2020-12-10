@@ -3,11 +3,9 @@
 ##########################
 
 
-# Built-in
 import os
 import shutil
 
-# Local
 import cv2
 import numpy as np
 

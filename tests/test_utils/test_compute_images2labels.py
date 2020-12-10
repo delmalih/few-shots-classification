@@ -3,7 +3,6 @@
 ##########################
 
 
-# Local
 from few_shots_clf.utils import compute_images2labels
 
 
