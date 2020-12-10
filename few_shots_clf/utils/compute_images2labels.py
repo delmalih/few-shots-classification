@@ -1,17 +1,27 @@
 ##########################
+# Imports
+##########################
+
+
+# Built-in
+from typing import Dict
+from typing import List
+
+
+##########################
 # Function
 ##########################
 
 
-def compute_images2labels(images, labels):
-    """[summary]
+def compute_images2labels(images: List[str], labels: List[str]) -> Dict:
+    """Maps all image paths to a list of labels.
 
     Args:
-        images ([type]): [description]
-        labels ([type]): [description]
+        images (List[str]): The list of image paths.
+        labels (List[str]): The list of labels.
 
     Returns:
-        [type]: [description]
+        Dict: The mapping between the image paths and the labels.
     """
     # Init images2labels dict
     images2labels = {}
