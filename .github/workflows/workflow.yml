@@ -23,6 +23,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -r requirements-dev.txt
       - name: Install package
         run: |
           python setup.py build
@@ -41,6 +42,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -r requirements-dev.txt
           pip install .
       - name: Install pylint
         run: |
@@ -62,6 +64,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -r requirements-dev.txt
           pip install .
       - name: Install pytest
         run: |
@@ -87,6 +90,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -r requirements-dev.txt
           pip install .
       - name: Install twine & setuptools
         run: |
