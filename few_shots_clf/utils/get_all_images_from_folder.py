@@ -3,11 +3,9 @@
 ##########################
 
 
-# Built-in
 import os
 from typing import List
 
-# Global
 import cv2
 
 

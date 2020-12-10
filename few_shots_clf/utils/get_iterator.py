@@ -3,10 +3,8 @@
 ##########################
 
 
-# Built-in
 from typing import Iterable
 
-# Global
 from tqdm import tqdm
 
 

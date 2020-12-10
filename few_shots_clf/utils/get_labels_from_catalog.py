@@ -3,10 +3,8 @@
 ##########################
 
 
-# Built-in
 from typing import List
 
-# Local
 from .get_all_images_from_folder import get_all_images_from_folder
 
 

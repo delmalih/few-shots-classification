@@ -3,10 +3,8 @@
 ##########################
 
 
-# Built-in
 from typing import List
 
-# Global
 import cv2
 import numpy as np
 
