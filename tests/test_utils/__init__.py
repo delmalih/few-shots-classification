@@ -3,11 +3,9 @@
 ##########################
 
 
-# Built-in
 import os
 
-# Local
-from few_shots_clf.test import TEST_DIRECTORY_PATH as DIR_PATH
+from tests import TEST_DIRECTORY_PATH as DIR_PATH
 
 
 ##########################

@@ -3,16 +3,14 @@
 ##########################
 
 
-# Built-in
 import os
 import shutil
 
-# Local
-from few_shots_clf.test import empty_dir
-from few_shots_clf.test import build_catalog
-from few_shots_clf.test import delete_catalog
 from few_shots_clf.utils import get_labels_from_catalog
-from few_shots_clf.test.test_utils import TEST_DIRECTORY_PATH
+from tests import empty_dir
+from tests import build_catalog
+from tests import delete_catalog
+from tests.test_utils import TEST_DIRECTORY_PATH
 
 
 ##########################

@@ -3,10 +3,8 @@
 ##########################
 
 
-# Global
 import setuptools
 
-# Local
 import few_shots_clf
 
 
