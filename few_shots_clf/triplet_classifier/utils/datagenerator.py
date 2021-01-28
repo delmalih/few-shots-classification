@@ -1,4 +1,4 @@
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-arguments, too-many-instance-attributes
 
 ##########################
 # Imports
@@ -11,6 +11,7 @@ import numpy as np
 from tensorflow import keras
 
 from few_shots_clf import utils
+from few_shots_clf.triplet_classifier.utils import Augmenter
 
 
 ##########################
@@ -29,12 +30,14 @@ class DataGenerator(keras.utils.Sequence):
             label_ids: List,
             image_size: int,
             batch_size: int,
+            augment_factor: int,
             shuffle: bool = True):
         """ Initialisation """
         self.img_paths = img_paths
         self.label_ids = label_ids
         self.image_size = image_size
         self.batch_size = batch_size
+        self.augmenter = Augmenter(augment_factor)
         self.shuffle = shuffle
         self.on_epoch_end()
 
@@ -47,18 +50,23 @@ class DataGenerator(keras.utils.Sequence):
     def __data_generation(self, img_paths_tmp: List, label_ids_tmp: List) -> (np.array, np.array):
         """ Generates data containing batch_size samples """
         # Initialization
-        data_x = np.empty((self.batch_size,
+        images = np.empty((self.batch_size,
                            self.image_size,
                            self.image_size,
-                           3))
-        data_y = np.empty((self.batch_size))
+                           3),
+                          dtype=np.uint8)
+        labels = np.empty((self.batch_size), dtype=np.int)
 
         # Generate data
         for i, img_path in enumerate(img_paths_tmp):
-            data_x[i] = utils.read_image(img_path, size=self.image_size) / 256.
-            data_y[i] = label_ids_tmp[i]
+            images[i] = utils.read_image(img_path, size=self.image_size)
+            labels[i] = label_ids_tmp[i]
 
-        return data_x, data_y
+        # Augment data
+        images, labels = self.augmenter.augment(images, labels)
+        images = images / 255.
+
+        return images, labels
 
     def __len__(self) -> int:
         """ Denotes the number of batches per epoch """
@@ -66,8 +74,9 @@ class DataGenerator(keras.utils.Sequence):
 
     def __getitem__(self, index: int) -> (np.array, np.array):
         """ Generate one batch of data """
-        indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+        indexes = self.indexes[index * self.batch_size:
+                               (index+1)*self.batch_size]
         img_paths_tmp = [self.img_paths[k] for k in indexes]
         label_ids_tmp = [self.label_ids[k] for k in indexes]
-        data_x, data_y = self.__data_generation(img_paths_tmp, label_ids_tmp)
-        return data_x, data_y
+        images, labels = self.__data_generation(img_paths_tmp, label_ids_tmp)
+        return images, labels

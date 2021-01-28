@@ -57,6 +57,8 @@ class TripletClassifier:
             "triplet_margin": params.get("triplet_margin", constants.TRIPLET_MARGIN),
             "mining_strategy": params.get("mining_strategy", constants.MINING_STRATEGY),
             "embedding_size": params.get("embedding_size", constants.EMBEDDING_SIZE),
+            "basic_batch_size": params.get("basic_batch_size", constants.BASIC_BATCH_SIZE),
+            "augment_factor": params.get("augment_factor", constants.AUGMENT_FACTOR),
             "batch_size": params.get("batch_size", constants.BATCH_SIZE),
             "n_epochs": params.get("n_epochs", constants.N_EPOCHS),
             "fingerprint_path": params.get("fingerprint_path",
@@ -127,7 +129,8 @@ class TripletClassifier:
         return triplet_utils.DataGenerator(self.catalog_images,
                                            catalog_label_ids,
                                            self.config.image_size,
-                                           self.config.batch_size)
+                                           self.config.basic_batch_size,
+                                           self.config.augment_factor)
 
     ##########################
     # Predict
