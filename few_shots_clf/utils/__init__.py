@@ -5,3 +5,4 @@ from .compute_descriptors import compute_descriptors
 from .compute_images2labels import compute_images2labels
 from .get_labels_from_catalog import get_labels_from_catalog
 from .get_all_images_from_folder import get_all_images_from_folder
+from .compute_catalog_fingerprint import compute_catalog_fingerprint

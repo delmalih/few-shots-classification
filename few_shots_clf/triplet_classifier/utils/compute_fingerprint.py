@@ -50,25 +50,13 @@ def compute_config_fingerprint(config: Dict) -> str:
     # Init config fingerprint
     config_fingerprint = ""
 
-    # Add feature_descriptor
-    config_fingerprint = f"{config_fingerprint}{str(config.feature_descriptor.getDefaultName())}"
-
-    # Add feature_dimension
-    config_fingerprint = f"{config_fingerprint}{config.feature_dimension}"
-
     # Add image_size
     config_fingerprint = f"{config_fingerprint}{config.image_size}"
 
-    # Add keypoint_stride
-    config_fingerprint = f"{config_fingerprint}{config.keypoint_stride}"
+    # Add mining_strategy
+    config_fingerprint = f"{config_fingerprint}{config.mining_strategy}"
 
-    # Add keypoint_sizes
-    config_fingerprint = f"{config_fingerprint}{str(config.keypoint_sizes)}"
-
-    # Add matcher_distance
-    config_fingerprint = f"{config_fingerprint}{config.matcher_distance}"
-
-    # Add matcher_n_trees
-    config_fingerprint = f"{config_fingerprint}{config.matcher_n_trees}"
+    # Add embedding_size
+    config_fingerprint = f"{config_fingerprint}{config.embedding_size}"
 
     return config_fingerprint
