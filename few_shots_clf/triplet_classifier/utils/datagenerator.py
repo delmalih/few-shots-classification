@@ -11,7 +11,7 @@ import numpy as np
 from tensorflow import keras
 
 from few_shots_clf import utils
-from few_shots_clf.triplet_classifier.utils import Augmenter
+from . import Augmenter
 
 
 ##########################
