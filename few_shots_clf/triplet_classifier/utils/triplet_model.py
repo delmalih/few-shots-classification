@@ -23,10 +23,11 @@ class TripletModel(keras.Model):
     def __init__(self, embedding_size: int, model_backbone: str):
         super().__init__()
         self.backbone = self._get_backbone(model_backbone)
-        self.flatten = keras.layers.Flatten()
-        self.embedding_layer = keras.layers.Dense(embedding_size)
-        self.l2_normalization_layer = keras.layers.Lambda(
-            lambda x: K.l2_normalize(x, axis=1))
+        self.flatten = keras.layers.Flatten(name="flatten_layer")
+        self.embedding_layer = keras.layers.Dense(embedding_size,
+                                                  name="embedding_layer")
+        self.l2_normalization_layer = keras.layers.Lambda(lambda x: K.l2_normalize(x, axis=1),
+                                                          name="l2_normalization_layer")
 
     @staticmethod
     def _get_backbone(model_backbone: str) -> keras.Model:
