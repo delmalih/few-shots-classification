@@ -101,19 +101,18 @@ class TripletClassifier:
                                     use_multiprocessing=False)
 
     def _get_triplet_model(self) -> keras.Model:
-        input_layer = keras.layers.Input(
-            shape=(self.config.image_size, self.config.image_size, 3))
-        vgg16_output = keras.applications.VGG16(include_top=False)(input_layer)
-        flatten = keras.layers.Flatten()(vgg16_output)
-        output_layer = keras.layers.Dense(self.config.embedding_size)(flatten)
-        triplet_model = keras.Model(inputs=input_layer, outputs=output_layer)
+        triplet_model = triplet_utils.TripletModel(self.config.embedding_size)
+        triplet_model.build(input_shape=(self.config.batch_size,
+                                         self.config.image_size,
+                                         self.config.image_size,
+                                         3))
         if self.config.verbose:
             triplet_model.summary()
         return triplet_model
 
     def _compile_triplet_model(self, triplet_model: keras.Model):
-        triplet_loss = triplet_utils.triplet_loss_function(
-            self.config.triplet_margin, self.config.mining_strategy)
+        triplet_loss = triplet_utils.triplet_loss_function(self.config.triplet_margin,
+                                                           self.config.mining_strategy)
         triplet_metric = triplet_utils.triplet_loss_metric(
             self.config.triplet_margin)
         triplet_model.compile(optimizer="adam",

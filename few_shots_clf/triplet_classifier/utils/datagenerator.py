@@ -47,8 +47,10 @@ class DataGenerator(keras.utils.Sequence):
     def __data_generation(self, img_paths_tmp: List, label_ids_tmp: List) -> (np.array, np.array):
         """ Generates data containing batch_size samples """
         # Initialization
-        data_x = np.empty(
-            (self.batch_size, self.image_size, self.image_size, 3))
+        data_x = np.empty((self.batch_size,
+                           self.image_size,
+                           self.image_size,
+                           3))
         data_y = np.empty((self.batch_size))
 
         # Generate data
