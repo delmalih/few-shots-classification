@@ -31,6 +31,10 @@ BATCH_SIZE = BASIC_BATCH_SIZE * AUGMENT_FACTOR
 
 N_EPOCHS = 10
 
+MODEL_BACKBONE = "resnet101"
+
+LEARNING_RATE = 1e-4
+
 TMP_FOLDER_PATH = "/tmp/few_shots_clf/triplet_classifier/"  # existing path
 
 FINGERPRINT_PATH = os.path.join(TMP_FOLDER_PATH,

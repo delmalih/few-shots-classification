@@ -1,4 +1,4 @@
-# pylint: disable=attribute-defined-outside-init, no-member, no-self-use
+# pylint: disable=attribute-defined-outside-init, no-member
 
 ##########################
 # Imports
@@ -10,7 +10,6 @@ from typing import Dict
 
 import pickle
 import numpy as np
-from tensorflow import keras
 from easydict import EasyDict as edict
 
 from few_shots_clf import utils
@@ -48,6 +47,8 @@ class TripletClassifier:
         self._get_catalog_images(catalog_path)
         self._get_catalog_labels(catalog_path)
         self._get_catalog_images2labels()
+        self._get_triplet_model()
+        self._compile_triplet_model()
         self._load_fingerprints()
 
     def _get_classifier_config(self, params):
@@ -61,6 +62,8 @@ class TripletClassifier:
             "augment_factor": params.get("augment_factor", constants.AUGMENT_FACTOR),
             "batch_size": params.get("batch_size", constants.BATCH_SIZE),
             "n_epochs": params.get("n_epochs", constants.N_EPOCHS),
+            "model_backbone": params.get("model_backbone", constants.MODEL_BACKBONE),
+            "learning_rate": params.get("learning_rate", constants.LEARNING_RATE),
             "fingerprint_path": params.get("fingerprint_path",
                                            constants.FINGERPRINT_PATH),
         })
@@ -74,6 +77,25 @@ class TripletClassifier:
     def _get_catalog_images2labels(self):
         self.catalog_images2labels = utils.compute_images2labels(self.catalog_images,
                                                                  self.catalog_labels)
+
+    def _get_triplet_model(self):
+        self.triplet_model = triplet_utils.TripletModel(self.config.embedding_size,
+                                                        self.config.model_backbone)
+        self.triplet_model.build(input_shape=(self.config.batch_size,
+                                              self.config.image_size,
+                                              self.config.image_size,
+                                              3))
+        if self.config.verbose:
+            self.triplet_model.summary()
+
+    def _compile_triplet_model(self):
+        triplet_loss = triplet_utils.triplet_loss_function(self.config.triplet_margin,
+                                                           self.config.mining_strategy)
+        triplet_metric = triplet_utils.triplet_loss_metric(
+            self.config.triplet_margin)
+        self.triplet_model.compile(optimizer="adam",
+                                   loss=triplet_loss,
+                                   metrics=[triplet_metric])
 
     def _load_fingerprints(self):
         # Previous fingerprint
@@ -95,31 +117,10 @@ class TripletClassifier:
         """Method used to train the classifier.
         """
         train_generator = self._get_data_generator()
-        triplet_model = self._get_triplet_model()
-        self._compile_triplet_model(triplet_model)
-        triplet_model.fit_generator(generator=train_generator,
-                                    epochs=self.config.n_epochs,
-                                    verbose=self.config.verbose,
-                                    use_multiprocessing=False)
-
-    def _get_triplet_model(self) -> keras.Model:
-        triplet_model = triplet_utils.TripletModel(self.config.embedding_size)
-        triplet_model.build(input_shape=(self.config.batch_size,
-                                         self.config.image_size,
-                                         self.config.image_size,
-                                         3))
-        if self.config.verbose:
-            triplet_model.summary()
-        return triplet_model
-
-    def _compile_triplet_model(self, triplet_model: keras.Model):
-        triplet_loss = triplet_utils.triplet_loss_function(self.config.triplet_margin,
-                                                           self.config.mining_strategy)
-        triplet_metric = triplet_utils.triplet_loss_metric(
-            self.config.triplet_margin)
-        triplet_model.compile(optimizer="adam",
-                              loss=triplet_loss,
-                              metrics=[triplet_metric])
+        self.triplet_model.fit_generator(generator=train_generator,
+                                         epochs=self.config.n_epochs,
+                                         verbose=self.config.verbose,
+                                         use_multiprocessing=False)
 
     def _get_data_generator(self) -> triplet_utils.DataGenerator:
         catalog_labels = list(
