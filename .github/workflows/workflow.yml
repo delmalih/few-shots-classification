@@ -25,6 +25,7 @@ jobs:
           pip install -r requirements/requirements.txt
           pip install -r requirements/requirements-dev.txt
           pip install -r requirements/requirements-docs.txt
+          pip install tensorflow==2.4.1
       - name: Install package
         run: |
           python setup.py build
@@ -45,6 +46,7 @@ jobs:
           pip install -r requirements/requirements.txt
           pip install -r requirements/requirements-dev.txt
           pip install -r requirements/requirements-docs.txt
+          pip install tensorflow==2.4.1
           pip install .
       - name: Install pylint
         run: |
@@ -69,6 +71,7 @@ jobs:
           pip install -r requirements/requirements-dev.txt
           pip install -r requirements/requirements-docs.txt
           pip install .
+          pip install tensorflow==2.4.1
       - name: Install pytest
         run: |
           sudo pip install pytest
@@ -96,6 +99,7 @@ jobs:
           pip install -r requirements/requirements-dev.txt
           pip install -r requirements/requirements-docs.txt
           pip install .
+          pip install tensorflow==2.4.1
       - name: Install twine & setuptools
         run: |
           pip install twine setuptools
