@@ -94,19 +94,9 @@ class TripletClassifier:
                                                            self.config.mining_strategy)
         triplet_metric = triplet_utils.triplet_loss_metric(
             self.config.triplet_margin)
-        reduce_lr_on_plateau_callback = keras.callbacks.ReduceLROnPlateau(
-            monitor='loss')
-        checkpointer_callback = keras.callbacks.ModelCheckpoint(self.config.model_path,
-                                                                save_best_only=True,
-                                                                monitor='loss')
-        early_stopping_callback = keras.callbacks.EarlyStopping(monitor='loss',
-                                                                patience=10)
         self.triplet_model.compile(optimizer=keras.optimizers.Adam(lr=self.config.learning_rate),
                                    loss=triplet_loss,
-                                   metrics=[triplet_metric],
-                                   callbacks=[reduce_lr_on_plateau_callback,
-                                              checkpointer_callback,
-                                              early_stopping_callback])
+                                   metrics=[triplet_metric])
 
     def _load_fingerprints(self):
         # Previous fingerprint
@@ -128,10 +118,20 @@ class TripletClassifier:
         """Method used to train the classifier.
         """
         train_generator = self._get_data_generator()
+        reduce_lr_on_plateau_callback = keras.callbacks.ReduceLROnPlateau(
+            monitor='loss')
+        checkpointer_callback = keras.callbacks.ModelCheckpoint(self.config.model_path,
+                                                                save_best_only=True,
+                                                                monitor='loss')
+        early_stopping_callback = keras.callbacks.EarlyStopping(monitor='loss',
+                                                                patience=10)
         self.triplet_model.fit_generator(generator=train_generator,
                                          epochs=self.config.n_epochs,
                                          verbose=self.config.verbose,
-                                         use_multiprocessing=False)
+                                         use_multiprocessing=False,
+                                         callbacks=[reduce_lr_on_plateau_callback,
+                                                    checkpointer_callback,
+                                                    early_stopping_callback])
 
     def _get_data_generator(self) -> triplet_utils.DataGenerator:
         catalog_labels = list(
