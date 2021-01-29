@@ -55,7 +55,8 @@ def is_readable_by_opencv(extension: str) -> bool:
     Returns:
         bool: true if it is readable by opencv
     """
-    opencv_readable_extensions = ["bmp", "dib", "jpeg", "jpg", "jpe",
-                                  "jp2", "png", "pbm", "pgm", "ppm",
-                                  "sr", "ras", "tiff", "tif"]
+    opencv_readable_extensions = [".bmp", ".dib", ".jpeg", ".jpg", ".jpe",
+                                  ".jp2", ".png", ".pbm", ".pgm", ".ppm",
+                                  ".sr", ".ras", ".tiff", ".tif"]
+    extension = extension.lower()
     return extension in opencv_readable_extensions
