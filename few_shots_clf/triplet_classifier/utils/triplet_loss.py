@@ -82,8 +82,9 @@ def _get_triplet_mask(labels: tf.Tensor):
     i_not_equal_j = K.expand_dims(indices_not_equal, 2)
     i_not_equal_k = K.expand_dims(indices_not_equal, 1)
     j_not_equal_k = K.expand_dims(indices_not_equal, 0)
-    distinct_indices = tf.math.logical_and(
-        tf.math.logical_and(i_not_equal_j, i_not_equal_k), j_not_equal_k)
+    distinct_indices = tf.math.logical_and(tf.math.logical_and(i_not_equal_j,
+                                                               i_not_equal_k),
+                                           j_not_equal_k)
     label_equal = K.equal(K.expand_dims(labels, 0),
                           K.expand_dims(labels, 1))
     i_equal_j = K.expand_dims(label_equal, 2)
@@ -125,14 +126,15 @@ def batch_all_triplet_loss(
     mask = K.cast(mask, tf.float32)
     triplet_loss = tf.math.multiply(mask, triplet_loss)
     triplet_loss = K.maximum(triplet_loss, 0.0)
-    valid_triplets = K.cast(tf.math.greater(
-        triplet_loss, K.epsilon()), tf.float32)
+    valid_triplets = K.cast(tf.math.greater(triplet_loss,
+                                            K.epsilon()),
+                            tf.float32)
     num_positive_triplets = tf.math.reduce_sum(valid_triplets)
     num_valid_triplets = tf.math.reduce_sum(mask)
     fraction_positive_triplets = num_positive_triplets / \
         (num_valid_triplets + K.epsilon())
-    triplet_loss = tf.math.reduce_sum(
-        triplet_loss) / (num_positive_triplets + K.epsilon())
+    triplet_loss = tf.math.reduce_sum(triplet_loss) / \
+        (num_positive_triplets + K.epsilon())
     return triplet_loss, fraction_positive_triplets
 
 
@@ -158,18 +160,21 @@ def batch_hard_triplet_loss(
     pairwise_dist = _pairwise_distances(embeddings, squared=squared)
     mask_anchor_positive = _get_anchor_positive_triplet_mask(labels)
     mask_anchor_positive = K.cast(mask_anchor_positive, tf.float32)
-    anchor_positive_dist = tf.math.multiply(
-        mask_anchor_positive, pairwise_dist)
-    hardest_positive_dist = tf.math.reduce_max(
-        anchor_positive_dist, axis=1, keepdims=True)
+    anchor_positive_dist = tf.math.multiply(mask_anchor_positive,
+                                            pairwise_dist)
+    hardest_positive_dist = tf.math.reduce_max(anchor_positive_dist,
+                                               axis=1,
+                                               keepdims=True)
     mask_anchor_negative = _get_anchor_negative_triplet_mask(labels)
     mask_anchor_negative = K.cast(mask_anchor_negative, tf.float32)
-    max_anchor_negative_dist = tf.math.reduce_max(
-        pairwise_dist, axis=1, keepdims=True)
+    max_anchor_negative_dist = tf.math.reduce_max(pairwise_dist,
+                                                  axis=1,
+                                                  keepdims=True)
     anchor_negative_dist = pairwise_dist + \
         max_anchor_negative_dist * (1.0 - mask_anchor_negative)
-    hardest_negative_dist = tf.math.reduce_min(
-        anchor_negative_dist, axis=1, keepdims=True)
+    hardest_negative_dist = tf.math.reduce_min(anchor_negative_dist,
+                                               axis=1,
+                                               keepdims=True)
     triplet_loss = K.maximum(hardest_positive_dist -
                              hardest_negative_dist + margin, 0.0)
     triplet_loss = tf.math.reduce_mean(triplet_loss)
