@@ -65,8 +65,8 @@ class TripletClassifier:
             "n_epochs": params.get("n_epochs", constants.N_EPOCHS),
             "model_backbone": params.get("model_backbone", constants.MODEL_BACKBONE),
             "learning_rate": params.get("learning_rate", constants.LEARNING_RATE),
-            "fingerprint_path": params.get("fingerprint_path",
-                                           constants.FINGERPRINT_PATH),
+            "model_path": params.get("model_path", constants.MODEL_PATH),
+            "fingerprint_path": params.get("fingerprint_path", constants.FINGERPRINT_PATH),
         })
 
     def _get_catalog_images(self, catalog_path):
@@ -94,9 +94,19 @@ class TripletClassifier:
                                                            self.config.mining_strategy)
         triplet_metric = triplet_utils.triplet_loss_metric(
             self.config.triplet_margin)
+        reduce_lr_on_plateau_callback = keras.callbacks.ReduceLROnPlateau(
+            monitor='loss')
+        checkpointer_callback = keras.callbacks.ModelCheckpoint(self.config.model_path,
+                                                                save_best_only=True,
+                                                                monitor='loss')
+        early_stopping_callback = keras.callbacks.EarlyStopping(monitor='loss',
+                                                                patience=10)
         self.triplet_model.compile(optimizer=keras.optimizers.Adam(lr=self.config.learning_rate),
                                    loss=triplet_loss,
-                                   metrics=[triplet_metric])
+                                   metrics=[triplet_metric],
+                                   callbacks=[reduce_lr_on_plateau_callback,
+                                              checkpointer_callback,
+                                              early_stopping_callback])
 
     def _load_fingerprints(self):
         # Previous fingerprint
