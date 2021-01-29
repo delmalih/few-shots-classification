@@ -1,4 +1,4 @@
-# pylint: disable=attribute-defined-outside-init, no-member
+# pylint: disable=attribute-defined-outside-init, no-member, line-too-long
 
 ##########################
 # Imports
@@ -118,13 +118,15 @@ class TripletClassifier:
         """Method used to train the classifier.
         """
         train_generator = self._get_data_generator()
-        reduce_lr_on_plateau_callback = keras.callbacks.ReduceLROnPlateau(
-            monitor='loss')
+        reduce_lr_on_plateau_callback = keras.callbacks.ReduceLROnPlateau(monitor='loss',
+                                                                          verbose=self.config.verbose)
         checkpointer_callback = keras.callbacks.ModelCheckpoint(self.config.model_path,
                                                                 save_best_only=True,
-                                                                monitor='loss')
+                                                                monitor='loss',
+                                                                verbose=self.config.verbose)
         early_stopping_callback = keras.callbacks.EarlyStopping(monitor='loss',
-                                                                patience=10)
+                                                                patience=10,
+                                                                verbose=self.config.verbose)
         self.triplet_model.fit_generator(generator=train_generator,
                                          epochs=self.config.n_epochs,
                                          verbose=self.config.verbose,
