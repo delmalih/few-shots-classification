@@ -163,7 +163,8 @@ class TripletClassifier:
         self.catalog_embeddings = []
 
         # Loop over catalog images
-        for catalog_img_path in self.catalog_images:
+        for catalog_img_path in utils.get_iterator(self.catalog_images,
+                                                   verbose=self.config.verbose):
             # Read catalog image
             catalog_image = utils.read_image(catalog_img_path,
                                              size=self.config.image_size)
@@ -211,13 +212,12 @@ class TripletClassifier:
 
         # Compute scores
         scores = np.exp(-pairwise_distances ** 2)
-        softmax_scores = np.exp(scores) / np.exp(scores).sum()
 
         # Compute predicted label and score
-        predicted_catalog_image_id = np.argmax(softmax_scores, axis=-1)[0]
+        predicted_catalog_image_id = np.argmax(scores, axis=-1)[0]
         predicted_catalog_image = self.catalog_images[predicted_catalog_image_id]
         predicted_label = self.catalog_images2labels[predicted_catalog_image]
-        predicted_score = np.max(softmax_scores, axis=-1)[0]
+        predicted_score = np.max(scores, axis=-1)[0]
 
         return predicted_label, predicted_score
 
