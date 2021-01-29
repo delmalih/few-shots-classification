@@ -11,7 +11,7 @@ import numpy as np
 from tensorflow import keras
 
 from few_shots_clf import utils
-from . import Augmenter
+from .augmenter import Augmenter
 
 
 ##########################
