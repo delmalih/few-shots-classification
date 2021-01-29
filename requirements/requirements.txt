@@ -4,5 +4,6 @@ numpy==1.19.4
 imgaug==0.4.0
 easydict==1.9
 imutils==0.5.3
+tensorflow-addons==0.12.0
 opencv-python==3.4.2.16
 opencv-contrib-python==3.4.2.16
