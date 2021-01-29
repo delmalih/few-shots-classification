@@ -71,9 +71,13 @@ class TripletClassifier:
 
     def _get_catalog_images(self, catalog_path):
         self.catalog_images = utils.get_all_images_from_folder(catalog_path)
+        if self.config.verbose:
+            print(f"Found {len(self.catalog_images)} images!")
 
     def _get_catalog_labels(self, catalog_path):
         self.catalog_labels = utils.get_labels_from_catalog(catalog_path)
+        if self.config.verbose:
+            print(f"Found {len(self.catalog_labels)} labels!")
 
     def _get_catalog_images2labels(self):
         self.catalog_images2labels = utils.compute_images2labels(self.catalog_images,
