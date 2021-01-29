@@ -1,4 +1,4 @@
-# pylint: disable=attribute-defined-outside-init, no-member, line-too-long
+# pylint: disable=attribute-defined-outside-init, no-member, line-too-long, too-many-instance-attributes
 
 ##########################
 # Imports
@@ -6,7 +6,7 @@
 
 
 import os
-from typing import Dict
+from typing import Dict, List
 
 import pickle
 import numpy as np
@@ -122,22 +122,11 @@ class TripletClassifier:
         """Method used to train the classifier.
         """
         train_generator = self._get_data_generator()
-        reduce_lr_on_plateau_callback = keras.callbacks.ReduceLROnPlateau(monitor='loss',
-                                                                          verbose=self.config.verbose)
-        checkpointer_callback = keras.callbacks.ModelCheckpoint(self.config.model_path,
-                                                                save_best_only=True,
-                                                                monitor='loss',
-                                                                verbose=self.config.verbose)
-        early_stopping_callback = keras.callbacks.EarlyStopping(monitor='loss',
-                                                                patience=10,
-                                                                verbose=self.config.verbose)
         self.triplet_model.fit_generator(generator=train_generator,
                                          epochs=self.config.n_epochs,
                                          verbose=self.config.verbose,
                                          use_multiprocessing=False,
-                                         callbacks=[reduce_lr_on_plateau_callback,
-                                                    checkpointer_callback,
-                                                    early_stopping_callback])
+                                         callbacks=self._get_model_callbacks())
 
     def _get_data_generator(self) -> triplet_utils.DataGenerator:
         catalog_labels = list(
@@ -150,9 +139,87 @@ class TripletClassifier:
                                            self.config.basic_batch_size,
                                            self.config.augment_factor)
 
+    def _get_model_callbacks(self) -> List:
+        reduce_lr_on_plateau_callback = keras.callbacks.ReduceLROnPlateau(monitor='loss',
+                                                                          verbose=self.config.verbose)
+        checkpointer_callback = keras.callbacks.ModelCheckpoint(self.config.model_path,
+                                                                save_best_only=True,
+                                                                monitor='loss',
+                                                                verbose=self.config.verbose)
+        early_stopping_callback = keras.callbacks.EarlyStopping(monitor='loss',
+                                                                patience=10,
+                                                                verbose=self.config.verbose)
+        return [reduce_lr_on_plateau_callback,
+                checkpointer_callback,
+                early_stopping_callback]
+
+    def compute_catalog_embeddings(self) -> np.array:
+        """[summary]
+
+        Returns:
+            np.array: [description]
+        """
+        # Init. catalog embeddings
+        self.catalog_embeddings = []
+
+        # Loop over catalog images
+        for catalog_img_path in self.catalog_images:
+            # Read catalog image
+            catalog_image = utils.read_image(catalog_img_path,
+                                             size=self.config.image_size)
+            catalog_image = np.expand_dims(catalog_image, axis=0)
+
+            # Compute embedding
+            catalog_emdding = self.triplet_model.predict(catalog_image)[0]
+
+            # Update catalog_emddings
+            self.catalog_embeddings.append(catalog_emdding)
+
+        self.catalog_embeddings = np.array(self.catalog_embeddings)
+
     ##########################
     # Predict
     ##########################
+
+    def predict(self, query_path: str) -> np.array:
+        """Method used to predict a score per class for a given query.
+
+        Args:
+            query_path (str): The local path of the query.
+
+        Returns:
+            np.array: The list of scores per class.
+        """
+        # Read img
+        query_img = utils.read_image(query_path, size=self.config.image_size)
+        query_img = np.expand_dims(query_img, axis=0)
+
+        # Get query embedding
+        query_embedding = self.triplet_model.predict(query_img)
+
+        # Get scores
+        scores = self._get_query_scores(query_embedding)
+        scores = np.array(scores)
+
+        return scores
+
+    def _get_query_scores(self, query_embedding: np.array):
+        # Compute pairwise distances
+        pairwise_distances = np.linalg.norm(query_embedding[:, None, :] -
+                                            self.catalog_embeddings[None, :, :],
+                                            axis=-1)
+
+        # Compute scores
+        scores = np.exp(-pairwise_distances ** 2)
+        softmax_scores = np.exp(scores) / np.exp(scores).sum()
+
+        # Compute predicted label and score
+        predicted_catalog_image_id = np.argmax(softmax_scores, axis=-1)[0]
+        predicted_catalog_image = self.catalog_images[predicted_catalog_image_id]
+        predicted_label = self.catalog_images2labels[predicted_catalog_image]
+        predicted_score = np.max(softmax_scores, axis=-1)[0]
+
+        return predicted_label, predicted_score
 
     ##########################
     # Utils
