@@ -8,6 +8,6 @@ from .triplet_classifier import TripletClassifier
 
 __author__ = "David El Malih"
 __author_email__ = "da.elmalih@gmail.com"
-__version__ = "1.1.4"
+__version__ = "1.1.5"
 __description__ = "Few Shots Classification Library. " + \
                   "Classification task from a small amount of data."
