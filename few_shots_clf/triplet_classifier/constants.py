@@ -35,7 +35,11 @@ MODEL_BACKBONE = "vgg16"
 
 LEARNING_RATE = 1e-4
 
+
 TMP_FOLDER_PATH = "/tmp/few_shots_clf/triplet_classifier/"  # existing path
 
 FINGERPRINT_PATH = os.path.join(TMP_FOLDER_PATH,
                                 "fingerprint.pickle")
+
+MODEL_PATH = os.path.join(TMP_FOLDER_PATH,
+                          "triplet_model")
