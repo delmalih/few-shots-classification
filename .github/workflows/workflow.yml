@@ -70,8 +70,8 @@ jobs:
           pip install -r requirements/requirements.txt
           pip install -r requirements/requirements-dev.txt
           pip install -r requirements/requirements-docs.txt
-          pip install .
           pip install tensorflow==2.4.1
+          pip install .
       - name: Install pytest
         run: |
           sudo pip install pytest
