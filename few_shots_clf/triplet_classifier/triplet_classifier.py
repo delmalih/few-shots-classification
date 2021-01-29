@@ -10,6 +10,7 @@ from typing import Dict
 
 import pickle
 import numpy as np
+from tensorflow import keras
 from easydict import EasyDict as edict
 
 from few_shots_clf import utils
@@ -93,7 +94,7 @@ class TripletClassifier:
                                                            self.config.mining_strategy)
         triplet_metric = triplet_utils.triplet_loss_metric(
             self.config.triplet_margin)
-        self.triplet_model.compile(optimizer="adam",
+        self.triplet_model.compile(optimizer=keras.optimizers.Adam(lr=self.config.learning_rate),
                                    loss=triplet_loss,
                                    metrics=[triplet_metric])
 
