@@ -5,11 +5,8 @@
 
 from hashlib import sha224
 
-import cv2
-import numpy as np
-
-from few_shots_clf.utils import get_all_images_from_folder
 from few_shots_clf.utils import get_iterator
+from few_shots_clf.utils import get_all_images_from_folder
 
 
 ##########################
@@ -44,20 +41,8 @@ def compute_catalog_fingerprint(catalog_path: str, verbose=True) -> str:
         # Hash image_path
         path_hash = sha224(str.encode(image_path)).hexdigest()
 
-        # Read image
-        img = cv2.imread(image_path)
-
-        # Convert image to string
-        img_str = np.array2string(img)
-
-        # Hash image
-        img_hash = sha224(str.encode(img_str)).hexdigest()
-
-        # Compute image_fingerprint
-        image_fingerprint = f"{path_hash}{img_hash}"
-
         # Update catalog_fingerprint
-        catalog_fingerprint = f"{catalog_fingerprint}{image_fingerprint}"
+        catalog_fingerprint = f"{catalog_fingerprint}{path_hash}"
 
     # Compute final fingerprint
     catalog_fingerprint = sha224(str.encode(catalog_fingerprint)).hexdigest()
