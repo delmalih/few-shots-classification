@@ -61,13 +61,13 @@ class TripletClassifier:
             "embedding_size": params.get("embedding_size", constants.EMBEDDING_SIZE),
             "basic_batch_size": params.get("basic_batch_size", constants.BASIC_BATCH_SIZE),
             "augment_factor": params.get("augment_factor", constants.AUGMENT_FACTOR),
-            "batch_size": params.get("batch_size", constants.BATCH_SIZE),
             "n_epochs": params.get("n_epochs", constants.N_EPOCHS),
             "model_backbone": params.get("model_backbone", constants.MODEL_BACKBONE),
             "learning_rate": params.get("learning_rate", constants.LEARNING_RATE),
             "model_path": params.get("model_path", constants.MODEL_PATH),
             "fingerprint_path": params.get("fingerprint_path", constants.FINGERPRINT_PATH),
         })
+        self.config.batch_size = self.config.basic_batch_size * self.config.augment_factor
 
     def _get_catalog_images(self, catalog_path):
         self.catalog_images = utils.get_all_images_from_folder(catalog_path)
@@ -181,6 +181,11 @@ class TripletClassifier:
     ##########################
     # Predict
     ##########################
+
+    def load_best_model(self):
+        """Loads the best weights from previous training
+        """
+        self.triplet_model.load_weights(self.config.model_path)
 
     def predict(self, query_path: str) -> np.array:
         """Method used to predict a score per class for a given query.
